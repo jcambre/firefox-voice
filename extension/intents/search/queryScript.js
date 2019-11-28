@@ -108,11 +108,31 @@ this.queryScript = (function() {
     ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     ctx.drawWindow(window, rect.x, rect.y, rect.width, rect.height, "#fff");
     return {
+      left: rect.x,
+      top: rect.y,
       width: rect.width,
       height: rect.height,
       src: canvas.toDataURL(),
       alt: card.innerText,
       hasWidget,
     };
+  });
+
+  communicate.register("cardIframe", message => {
+    // resizeResultsBody();
+    const cards = findCards();
+    const card = cards.sidebarCard || cards.card;
+    if (!card) {
+      throw new Error("No card found for cardImage");
+    }
+    // When it has a canvas it may dynamically update,
+    // And timers have this id, otherwise hard to detect:
+    const hasWidget = !!(
+      card.querySelector("canvas") ||
+      card.querySelector("#timer-stopwatch-container")
+    );
+    const rect = card.getBoundingClientRect();
+    rect.hasCard = true;
+    return rect;
   });
 })();

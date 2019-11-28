@@ -511,6 +511,8 @@ this.popupView = (function() {
     const { searchResults, index, searchUrl } = search;
     const card = cardImage;
     const next = searchResults[index + 1];
+    const iframeStyle = card ? { marginTop: '-' + card.top + 'px', marginLeft: '-' + card.left + 'px', height: card.height } : {}
+    const iframeWrapperStyle = card ? {overflow: 'hidden', position: 'relative', height: card.height } : {};
     const cardStyles = card ? { height: card.height, width: card.width } : {};
     const imgAlt =
       card && card.alt
@@ -531,14 +533,26 @@ this.popupView = (function() {
         <div id="search-results">
           {/* FIXME: img alt is using "next" title, but it should use the card title, which is not available in the data  */}
           {card ? (
-            <img
-              id="search-image"
-              alt={imgAlt}
-              onClick={onSearchCardClick}
-              style={cardStyles}
-              src={card.src}
-              role="button"
-            />
+            // <img
+            //   id="search-image"
+            //   alt={imgAlt}
+            //   onClick={onSearchCardClick}
+            //   style={cardStyles}
+            //   src={card.src}
+            //   role="button"
+            // />
+            <div id="iframe-wrapper"
+              style={iframeWrapperStyle}
+            >
+              <iframe 
+                id="google-if"
+                src={searchUrl}
+                style={iframeStyle}
+                width="320"
+                scrolling="no"
+                frameBorder="0"
+              />
+            </div>
           ) : null}
           {next ? (
             <div id="search-show-next">
