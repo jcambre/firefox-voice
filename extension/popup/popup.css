@@ -24,6 +24,7 @@ body,
   min-width: inherit;
   width: 350px;
   padding: 1rem;
+  border: 2px solid tomato;
 }
 
 #zap-wrapper {

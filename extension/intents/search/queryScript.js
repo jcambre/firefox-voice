@@ -5,17 +5,22 @@ this.queryScript = (function() {
   const SIDEBAR_SELECTOR = "#rhs";
   const MAIN_SELECTOR = "#center_col";
 
+  function resizeResultsBody() {
+    document.getElementsByTagName("body")[0].style.width = "325px";
+  }
+
   function findCards() {
     const topElement = document.querySelector("a > h3");
     const maxBottom = topElement.getBoundingClientRect().y;
     return {
-      card: findCardIn(document.querySelector(MAIN_SELECTOR), maxBottom),
-      sidebarCard: findCardIn(document.querySelector(SIDEBAR_SELECTOR), null),
+      card: findCardIn(document.querySelector(MAIN_SELECTOR), null),
+      // sidebarCard: findCardIn(document.querySelector(SIDEBAR_SELECTOR), null),
     };
   }
 
   function findCardIn(container, maxBottom) {
     let selected = container.querySelectorAll(CARD_SELECTOR);
+    console.log(`I GOT TO HERE AND I FOUND ${JSON.stringify(selected)}`);
     if (maxBottom) {
       // FIXME: this is testing if the top of the card is above the top of the first search
       // result, as opposed to testing if the *bottom* of the card is there. This probably doesn't
@@ -61,6 +66,7 @@ this.queryScript = (function() {
   }
 
   communicate.register("searchResultInfo", message => {
+    // resizeResultsBody();
     const cards = findCards();
     const searchHeaders = document.querySelectorAll("a > h3");
     const searchResults = [];
@@ -79,6 +85,7 @@ this.queryScript = (function() {
   });
 
   communicate.register("cardImage", message => {
+    // resizeResultsBody();
     const cards = findCards();
     const card = cards.sidebarCard || cards.card;
     if (!card) {
