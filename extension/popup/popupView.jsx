@@ -307,7 +307,7 @@ this.popupView = (function() {
       <React.Fragment>
         <TextDisplay displayText={displayText} />
         <VoiceInput suggestions={suggestions} onClickLexicon={onClickLexicon} />
-        <div style={{ opacity: 0 }}>
+        <div style={{ display: 'none' }}>
           <TypingInput onInputStarted={onInputStarted} />
         </div>
         {lastIntent ? (
@@ -511,7 +511,7 @@ this.popupView = (function() {
     const { searchResults, index, searchUrl } = search;
     const card = cardImage;
     const next = searchResults[index + 1];
-    const iframeStyle = card ? { marginLeft: '-' + card.left + 'px', height: card.height } : {}
+    const iframeStyle = card ? { marginLeft: '-' + card.left + 'px', marginTop: '-' + card.top + 'px', height: card.height } : {}
     const iframeWrapperStyle = card ? {overflow: 'hidden', position: 'relative' } : {};
     const cardStyles = card ? { height: card.height, width: card.width } : {};
     const imgAlt =
