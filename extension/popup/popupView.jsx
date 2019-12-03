@@ -520,8 +520,8 @@ this.popupView = (function() {
     const { searchResults, index, searchUrl } = search;
     const card = cardImage;
     const next = searchResults[index + 1];
-    const iframeStyle = card ? { marginLeft: '-' + card.left + 'px', marginTop: '-' + card.top + 'px', height: card.height } : {}
-    const iframeWrapperStyle = card ? {overflow: 'hidden', position: 'relative' } : {};
+    const iframeStyle = card ? { marginLeft: '-' + card.left + 'px', marginTop: '-5px', height: card.height } : {}
+    const iframeWrapperStyle = card ? {overflow: 'hidden', position: 'relative', height: card.height + 15 } : {};
     const cardStyles = card ? { height: card.height, width: card.width } : {};
     const imgAlt =
       card && card.alt
