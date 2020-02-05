@@ -28,6 +28,7 @@
   <% } %>
   "background": {
     "scripts": [
+      "recommender.js",
       "util.js",
       "buildSettings.js",
       "log.js",
@@ -70,6 +71,13 @@
       "run_at": "document_start"
     }
   ],
+  <% } else { %>
+    "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["borderify.js"]
+    }
+  ],    
   <% } %>
   "experiment_apis": {
     "voice": {
