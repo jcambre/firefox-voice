@@ -1,11 +1,10 @@
 #recommendation-popup {
     background: #3B0052; 
     border-radius: 3px; 
-    padding: 5px; 
     color: #fff;
-    font-family: 'Inter';
-    font-size: '13px';
-    text-align: 'center';
+    font-family: 'Inter' !important;
+    font-size: 13px !important;
+    text-align: center !important;
     position: fixed; 
     z-index: 100000; 
     top: 10px; 
@@ -13,13 +12,36 @@
     margin-right: 10px; 
     right: 0px;
     pointer-events: auto;
+    cursor: pointer;
     filter: drop-shadow(0 0 0.25rem crimson);
     animation: 0.7s slidein 0s forwards, 1s fadeout 10s forwards;
-    animation-play-state: running, running;
+    display: flex;
 }
 
 #recommendation-popup:hover {
     animation: 0s slidein 0s forwards;
+}
+
+#recommendation-dismiss {
+    flex: 1;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    pointer-events: auto;
+    padding: 5px;
+    border-radius: 3px 0px 0px 3px;
+}
+
+#recommendation-popup.dismissed {
+    animation: 1s fadeout forwards;
+}
+
+#recommendation-dismiss:hover {
+    background: rgb(28, 4, 37);
+}
+
+#recommendation-text {
+    padding: 5px 7px;
 }
 
 
