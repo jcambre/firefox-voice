@@ -66,6 +66,9 @@ this.main = (function() {
     } else if (message.type === "wakeword") {
       log.info("Received wakeword", message.wakeword);
       return browser.experiments.voice.openPopup();
+    } else if(message.type === "triggerPopupFromRecommendation") {
+      log.info("Asked to open popup from recommendation");
+      return browser.experiments.voice.openPopup();
     } else if (message.type === "createSurveyUrl") {
       return telemetry.createSurveyUrl(message.url);
     } else if (message.type === "voiceShimForward") {

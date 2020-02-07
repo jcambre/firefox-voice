@@ -28,7 +28,6 @@
   <% } %>
   "background": {
     "scripts": [
-      "recommender/recommender.js",
       "util.js",
       "buildSettings.js",
       "log.js",
@@ -60,7 +59,8 @@
       <% for (let serviceName of serviceNames) { %>
         "services/<%- serviceName %>/<%- serviceName %>.js",
       <% } %>
-      "searching.js"
+      "searching.js",
+      "recommender/recommender.js"
     ]
   },
   <% if (env.EXECUTE_INTENT_URL) { %>
@@ -75,7 +75,8 @@
     "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["recommender/borderify.js"]
+      "js": ["recommender/recommenderView.js"],
+      "match_about_blank": true
     }
   ],    
   <% } %>
@@ -121,6 +122,13 @@
         "popup/images/mic.svg",
       <% } %>
     "default_popup": "popup/popup.html"
+  },
+  "page_action": {
+    "browser_style": false,
+    "default_icon": "assets/images/favicons/page-icon-256-single-color-inactive.png",    
+    "default_title": "Firefox Voice: Recommendations",
+    "default_popup": "popup/popup.html",
+    "show_matches": ["<all_urls>"]
   },
   "commands": {
     "_execute_browser_action": {

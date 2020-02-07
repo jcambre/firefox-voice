@@ -21,7 +21,7 @@ this.intentExamples = (function() {
     return array[Math.floor(Math.random() * array.length)];
   }
 
-  function getAllExamples() {
+  exports.getAllExamples = function () {
     if (INTENT_EXAMPLES === null) {
       INTENT_EXAMPLES = {};
       for (const intentName in intentRunner.intents) {
@@ -61,7 +61,7 @@ this.intentExamples = (function() {
   };
 
   function freshExamples(number) {
-    const examplesByIntent = getAllExamples();
+    const examplesByIntent = exports.getAllExamples();
     const intentNames = shuffled(Object.keys(examplesByIntent));
     const result = [];
     for (let i = 0; i < number; i++) {
@@ -69,6 +69,20 @@ this.intentExamples = (function() {
     }
     return result;
   }
+
+  exports.getExamplesForIntentCategory = function(category, number) {
+    const allExamples = exports.getAllExamples();
+    const allIntents = Object.keys(allExamples);
+    const relevantIntents = allIntents.filter(intent => intent.includes(category));
+    let examplesForRelevantIntents = relevantIntents.reduce((accumulator, intent) => {
+      accumulator.push(allExamples[intent])
+      return accumulator;
+    }, []);
+    examplesForRelevantIntents = shuffled(examplesForRelevantIntents.flat());
+
+    const result = examplesForRelevantIntents.slice(0, number);
+    return result;
+  };
 
   return exports;
 })();
