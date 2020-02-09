@@ -1,4 +1,4 @@
-/* globals intentRunner, intentExamples, log, intents, telemetry, util, buildSettings, settings, browserUtil, catcher */
+/* globals intentRunner, intentExamples, log, intents, telemetry, util, buildSettings, settings, browserUtil, catcher, recommender */
 
 this.main = (function() {
   const exports = {};
@@ -31,6 +31,10 @@ this.main = (function() {
       return intentRunner.runUtterance(message.text, message.noPopup);
     } else if (message.type === "getExamples") {
       return intentExamples.getExamples(message.number || 2);
+    } else if (message.type === "getExamplesForIntentCategory") {
+      return intentExamples.getExamplesForIntentCategory(message.category, message.number || 2);
+    } else if (message.type === "getRecommendations") {
+      return recommender.getRecommendations();
     } else if (message.type === "getLastIntentForFeedback") {
       return intentRunner.getLastIntentForFeedback();
     } else if (message.type === "inDevelopment") {

@@ -40,6 +40,7 @@
       "js/vendor/ppnListing.js",
       "browserUtil.js",
       "limiter.js",
+      "recommender/recommender.js",
       "background/pageMetadata.js",
       "background/languages.js",
       "background/main.js",
@@ -59,8 +60,7 @@
       <% for (let serviceName of serviceNames) { %>
         "services/<%- serviceName %>/<%- serviceName %>.js",
       <% } %>
-      "searching.js",
-      "recommender/recommender.js"
+      "searching.js"
     ]
   },
   <% if (env.EXECUTE_INTENT_URL) { %>
@@ -127,7 +127,7 @@
     "browser_style": false,
     "default_icon": "assets/images/favicons/page-icon-256-single-color-inactive.png",    
     "default_title": "Firefox Voice: Recommendations",
-    "default_popup": "popup/popup.html",
+    "default_popup": "recommendations/recommendation.html",
     "show_matches": ["<all_urls>"]
   },
   "commands": {
