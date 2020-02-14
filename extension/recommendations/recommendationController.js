@@ -8,7 +8,7 @@ this.popupController = function () {
   const recommendationContainer = document.getElementById("recommendation-container");
   let isInitialized = false;
 
-  exports.RecommendationController = function () {
+  exports.recommendationController = function () {
     const [examples, setExamples] = useState([]);
     let isHovering = false;
     useEffect(() => {
@@ -27,27 +27,26 @@ this.popupController = function () {
       setExamples(recommendations);
     };
 
-    const showMoreOnHover = function () {
-      console.log("I AM HOVERING");
-      isHovering = true;
+    const onDismissRecommendationClick = async () => {
+      // TODO: Log that the dismiss button was clicked
+      window.close();
     };
 
-    return React.createElement("div", {
-      id: "recommendation-popup",
-      onMouseEnter: showMoreOnHover
-    }, React.createElement("div", {
-      id: "initial-recommendation"
-    }, React.createElement("div", {
-      id: "recommendation-dismiss"
-    }, "X"), React.createElement("div", {
-      id: "recommendation-text"
-    }, "Try asking Firefox Voice...", React.createElement("br", null), React.createElement("b", null, "\"", examples[0], "\""))), isHovering && React.createElement("div", {
-      id: "recommendation-extras"
-    }, React.createElement("div", {
-      id: "extra-recs"
-    }, React.createElement("div", null, "Or you can say..."), React.createElement("div", null, React.createElement("b", null, examples[1])), React.createElement("div", null, React.createElement("b", null, examples[2])))));
+    const onAcceptRecommendationClick = async () => {
+      // TODO: Log that the dismiss button was clicked
+      browser.runtime.sendMessage({
+        type: "triggerPopupFromRecommendation"
+      });
+      window.close();
+    };
+
+    return React.createElement(recommendationView.recommendation, {
+      examples: examples,
+      onDismissRecommendationClick: onDismissRecommendationClick,
+      onAcceptRecommendationClick: onAcceptRecommendationClick
+    });
   };
 
-  ReactDOM.render(React.createElement(exports.RecommendationController, null), recommendationContainer);
+  ReactDOM.render(React.createElement(exports.recommendationController, null), recommendationContainer);
   return exports;
 }();

@@ -1,25 +1,37 @@
-#recommendation-popup {
+body{
+    margin:0px !important;
+}
+
+#recommendation {
     border-radius: 3px; 
-    color: #3B0052;
     font-family: 'Inter' !important;
     font-size: 13px !important;
     min-width: 200px;
-    pointer-events: auto;
-    cursor: pointer;
     display: flex;
     flex-direction: column;
     flex: 1;
     margin: 0px;
 }
 
-#recommendation-dismiss {
-    flex: 1;
-    align-items: center;
+#recommendation-actions {
     display: flex;
-    justify-content: center;
-    pointer-events: auto;
-    padding: 5px;
-    border-radius: 3px 0px 0px 3px;
+    border-top: 1px solid #CFCFCF;
+    margin-top: 2em;
+    text-align: center;
+    cursor: pointer;
+}
+
+#dismiss-recommendation {
+    flex-grow: 1;
+    background-color: #EDEDED;
+    padding: 0.6em;
+}
+
+#accept-recommendation {
+    flex-grow: 1;
+    background-color: #175ADF;
+    color: #fff;
+    padding: 0.6em;
 }
 
 
