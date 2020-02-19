@@ -1,88 +1,79 @@
-/* globals intentRunner */
+import * as intentRunner from "./intentRunner.js";
 
-this.intentExamples = (function() {
-  const exports = {};
+const INTENT_ROTATION_PERIOD = 1000 * 60 * 5; // 5 minutes
+// This gets filled later:
+let INTENT_EXAMPLES = null;
 
-  const INTENT_ROTATION_PERIOD = 1000 * 60 * 5; // 5 minutes
-  // This gets filled later:
-  let INTENT_EXAMPLES = null;
+let lastExamples;
+let lastExampleTime = 0;
 
-  let lastExamples;
-  let lastExampleTime = 0;
+function shuffled(array) {
+  const withRandom = array.map(i => [Math.random(), i]);
+  withRandom.sort((a, b) => (a[0] < b[0] ? 1 : -1));
+  const result = withRandom.map(i => i[1]);
+  return result;
+}
 
-  function shuffled(array) {
-    const withRandom = array.map(i => [Math.random(), i]);
-    withRandom.sort((a, b) => (a[0] < b[0] ? 1 : -1));
-    const result = withRandom.map(i => i[1]);
-    return result;
-  }
+function pick(array) {
+  return array[Math.floor(Math.random() * array.length)];
+}
 
-  function pick(array) {
-    return array[Math.floor(Math.random() * array.length)];
-  }
-
-  exports.getAllExamples = function () {
-    if (INTENT_EXAMPLES === null) {
-      INTENT_EXAMPLES = {};
-      for (const intentName in intentRunner.intents) {
-        const intent = intentRunner.intents[intentName];
-        let examples = intent.examples;
-        if (!examples) {
+function getAllExamples() {
+  if (INTENT_EXAMPLES === null) {
+    INTENT_EXAMPLES = {};
+    for (const intentName in intentRunner.intents) {
+      const intent = intentRunner.intents[intentName];
+      const examples = intent.examples;
+      if (!examples) {
+        continue;
+      }
+      for (const example of examples) {
+        if (example.test) {
           continue;
         }
-        if (typeof examples === "function") {
-          examples = intent.examples();
+        if (!INTENT_EXAMPLES[intentName]) {
+          INTENT_EXAMPLES[intentName] = [];
         }
-        for (const example of examples) {
-          if (example.startsWith("test:")) {
-            continue;
-          }
-          if (!INTENT_EXAMPLES[intentName]) {
-            INTENT_EXAMPLES[intentName] = [];
-          }
-          INTENT_EXAMPLES[intentName].push(example);
-        }
+        INTENT_EXAMPLES[intentName].push(example.phrase);
       }
     }
-    return INTENT_EXAMPLES;
   }
+  return INTENT_EXAMPLES;
+}
 
-  exports.getExamples = function(number) {
-    if (
-      lastExamples &&
-      Date.now() - lastExampleTime < INTENT_ROTATION_PERIOD &&
-      lastExamples.length === number
-    ) {
-      return lastExamples;
-    }
-    lastExamples = freshExamples(number);
-    lastExampleTime = Date.now();
+export function getExamples(number) {
+  if (
+    lastExamples &&
+    Date.now() - lastExampleTime < INTENT_ROTATION_PERIOD &&
+    lastExamples.length === number
+  ) {
     return lastExamples;
-  };
-
-  function freshExamples(number) {
-    const examplesByIntent = exports.getAllExamples();
-    const intentNames = shuffled(Object.keys(examplesByIntent));
-    const result = [];
-    for (let i = 0; i < number; i++) {
-      result.push(pick(examplesByIntent[intentNames[i]]));
-    }
-    return result;
   }
+  lastExamples = freshExamples(number);
+  lastExampleTime = Date.now();
+  return lastExamples;
+}
 
-  exports.getExamplesForIntentCategory = function(category, number) {
-    const allExamples = exports.getAllExamples();
-    const allIntents = Object.keys(allExamples);
-    const relevantIntents = allIntents.filter(intent => intent.includes(category));
-    let examplesForRelevantIntents = relevantIntents.reduce((accumulator, intent) => {
-      accumulator.push(allExamples[intent])
-      return accumulator;
-    }, []);
-    examplesForRelevantIntents = shuffled(examplesForRelevantIntents.flat());
+export function getExamplesForIntentCategory(category, number) {
+  const allExamples = exports.getAllExamples();
+  const allIntents = Object.keys(allExamples);
+  const relevantIntents = allIntents.filter(intent => intent.includes(category));
+  let examplesForRelevantIntents = relevantIntents.reduce((accumulator, intent) => {
+    accumulator.push(allExamples[intent])
+    return accumulator;
+  }, []);
+  examplesForRelevantIntents = shuffled(examplesForRelevantIntents.flat());
 
-    const result = examplesForRelevantIntents.slice(0, number);
-    return result;
-  };
+  const result = examplesForRelevantIntents.slice(0, number);
+  return result;
+};
 
-  return exports;
-})();
+function freshExamples(number) {
+  const examplesByIntent = getAllExamples();
+  const intentNames = shuffled(Object.keys(examplesByIntent));
+  const result = [];
+  for (let i = 0; i < number; i++) {
+    result.push(pick(examplesByIntent[intentNames[i]]));
+  }
+  return result;
+}
