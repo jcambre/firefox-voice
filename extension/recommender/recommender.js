@@ -1,4 +1,4 @@
-import * as intentExamples from "../intentExamples.js";
+import * as intentExamples from "../background/intentExamples.js";
 import * as util from "../util.js";
 
 const RECOMMENDATION_INTERVAL = 1000 * 10; // 10s for testing // 1000 * 60 * 60 * 6; // 6 hours

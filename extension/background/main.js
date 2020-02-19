@@ -22,16 +22,6 @@ const TAB_UPDATE_FILTER = {
   properties: ["isArticle", "status"]
 }
 
-
-function fml() {
-  console.log("SLDKFJ");
-}
-
-browser.tabs.onUpdated.addListener( async(tabId, changeInfo, tabInfo) => {
-  console.log("tabID", tabId)
-  log.messaging("SDLKJFSLDFKJ");
-});
-
 browser.runtime.onMessage.addListener(async (message, sender) => {
   const properties = Object.assign({}, message);
   delete properties.type;
@@ -302,6 +292,11 @@ async function updateWakeword() {
     await browser.tabs.sendMessage(recorderTabId, { type: "updateWakeword" });
   }
 }
+
+browser.tabs.onUpdated.addListener(
+  recommender.handleTabUpdate,
+  TAB_UPDATE_FILTER
+);
 
 function setUninstallURL() {
   const url = telemetry.createSurveyUrl(UNINSTALL_SURVEY);

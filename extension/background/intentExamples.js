@@ -55,7 +55,7 @@ export function getExamples(number) {
 }
 
 export function getExamplesForIntentCategory(category, number) {
-  const allExamples = exports.getAllExamples();
+  const allExamples = getAllExamples();
   const allIntents = Object.keys(allExamples);
   const relevantIntents = allIntents.filter(intent => intent.includes(category));
   let examplesForRelevantIntents = relevantIntents.reduce((accumulator, intent) => {
