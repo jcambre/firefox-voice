@@ -47,15 +47,7 @@
       "js": ["nativeCommunication/executeIntentUrl.js"],
       "run_at": "document_start"
     }
-  ],
-  <% } else { %>
-    "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["recommender/recommenderView.js"],
-      "match_about_blank": true
-    }
-  ],    
+  ],  
   <% } %>
   "experiment_apis": {
     "voice": {

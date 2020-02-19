@@ -18,20 +18,6 @@ import { copyImage } from "../intents/clipboard/clipboard.js";
 const UNINSTALL_SURVEY =
   "https://qsurvey.mozilla.com/s3/Firefox-Voice-Exit-Survey";
 
-const TAB_UPDATE_FILTER = {
-  properties: ["isArticle", "status"]
-}
-
-
-function fml() {
-  console.log("SLDKFJ");
-}
-
-browser.tabs.onUpdated.addListener( async(tabId, changeInfo, tabInfo) => {
-  console.log("tabID", tabId)
-  log.messaging("SDLKJFSLDFKJ");
-});
-
 browser.runtime.onMessage.addListener(async (message, sender) => {
   const properties = Object.assign({}, message);
   delete properties.type;
@@ -302,6 +288,11 @@ async function updateWakeword() {
     await browser.tabs.sendMessage(recorderTabId, { type: "updateWakeword" });
   }
 }
+
+browser.tabs.onUpdated.addListener(
+  recommender.handleTabUpdate,
+  filter
+);
 
 function setUninstallURL() {
   const url = telemetry.createSurveyUrl(UNINSTALL_SURVEY);
