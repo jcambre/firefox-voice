@@ -14,8 +14,6 @@ let recommendations;
 
 export async function handleTabUpdate(tabId, changeInfo, tabInfo) {
     // Only report once
-    console.log("WHAAAA");
-    console.log(tabInfo);
     if (tabInfo.status == "complete" && changeInfo.status) {
         const timeSinceLastInvoked = Date.now() - lastRecommendationTime.all;
         if (timeSinceLastInvoked < RECOMMENDATION_INTERVAL) {

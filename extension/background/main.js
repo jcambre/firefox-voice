@@ -2,7 +2,7 @@
 
 import * as intentRunner from "./intentRunner.js";
 import * as intentExamples from "./intentExamples.js";
-import * as recommender from "../recommender/recommender.js";
+import * as recommender from "../recommendations/recommender.js";
 import * as telemetry from "./telemetry.js";
 import * as browserUtil from "../browserUtil.js";
 import * as settings from "../settings.js";
