@@ -1,6 +1,5 @@
 /* globals React, ReactDOM, log, buildSettings */
 
-// import * as recommender from "./recommender.js";
 // eslint isn't catching the JSX that uses recommendationView:
 // eslint-disable-next-line no-unused-vars
 import * as recommendationView from './recommendationView.js';

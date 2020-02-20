@@ -1,4 +1,5 @@
 import * as intentExamples from "../background/intentExamples.js";
+import * as currentState from './currentState.js';
 import * as util from "../util.js";
 
 const RECOMMENDATION_INTERVAL = 1000 * 10; // 10s for testing // 1000 * 60 * 60 * 6; // 6 hours
@@ -11,41 +12,6 @@ let lastRecommendationTime = {
 };
 
 let recommendations;
-
-export async function handleTabUpdate(tabId, changeInfo, tabInfo) {
-    // Only report once
-    if (tabInfo.status == "complete" && changeInfo.status) {
-        const timeSinceLastInvoked = Date.now() - lastRecommendationTime.all;
-        if (timeSinceLastInvoked < RECOMMENDATION_INTERVAL) {
-          return;
-        }
-        const latestRecTime = Date.now();
-        lastRecommendationTime.all = latestRecTime;
-
-        if (tabInfo.isArticle) {
-          // console.log("i got here");
-            lastRecommendationTime.article = latestRecTime;
-            recommendations = intentExamples.getExamplesForIntentCategory("read", 3);
-        }
-
-        // look for spotify addresses
-        const currentTabUrl = new URL(tabInfo.url);
-        if (currentTabUrl.hostname.includes("spotify")) {
-          lastRecommendationTime.music = latestRecTime;
-          recommendations = intentExamples.getExamplesForIntentCategory("music", 3);
-        }
-
-        if (currentTabUrl.hostname.includes("google") || currentTabUrl.hostname.includes("duckduckgo") ) {
-          lastRecommendationTime.music = latestRecTime;
-          recommendations = intentExamples.getExamplesForIntentCategory("search", 3);
-        }
-
-        // await browser.tabs.insertCSS(tabId, {file: "recommender/recommender.css"});
-        // await browser.tabs.sendMessage(tabId, {type: "onRecommendablePage", recommendations});
-        await browser.pageAction.show(tabId);
-        await callAttentionToRecommendations(tabId);
-    }
-}
 
 // This unfortunately won't work because content scripts can't modify privileged pages like about:newtab
 // async function handleNewTab(tabInfo) {
@@ -87,6 +53,23 @@ async function callAttentionToRecommendations(tabId) {
     tabId, path: "assets/images/favicons/page-icon-256-single-color-center-active.png"
   });
 } 
+
+export async function recommendIfApplicable(tabId) {
+  const timeSinceLastInvoked = Date.now() - lastRecommendationTime.all;
+  if (timeSinceLastInvoked < RECOMMENDATION_INTERVAL) {
+    return;
+  }
+  const latestRecTime = Date.now();
+  lastRecommendationTime.all = latestRecTime;
+  // lastRecommendationTime.article = latestRecTime;
+
+
+  await browser.pageAction.show(tabId);
+  await callAttentionToRecommendations(tabId);
+  getRecommendations();
+}
+
 export function getRecommendations() {
+  console.log("CURRENT STATE", currentState.currentState);
   return recommendations;
 }

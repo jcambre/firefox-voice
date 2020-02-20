@@ -2,6 +2,7 @@
 
 import * as intentRunner from "./intentRunner.js";
 import * as intentExamples from "./intentExamples.js";
+import * as currentState from "../recommendations/currentState.js";
 import * as recommender from "../recommendations/recommender.js";
 import * as telemetry from "./telemetry.js";
 import * as browserUtil from "../browserUtil.js";
@@ -19,7 +20,7 @@ const UNINSTALL_SURVEY =
   "https://qsurvey.mozilla.com/s3/Firefox-Voice-Exit-Survey";
 
 const TAB_UPDATE_FILTER = {
-  properties: ["isArticle", "status"]
+  properties: ["status"]
 }
 
 browser.runtime.onMessage.addListener(async (message, sender) => {
@@ -293,10 +294,20 @@ async function updateWakeword() {
   }
 }
 
-browser.tabs.onUpdated.addListener(
-  recommender.handleTabUpdate,
-  TAB_UPDATE_FILTER
-);
+// browser.tabs.onUpdated.addListener(
+//   currentState.handleTabUpdate,
+//   TAB_UPDATE_FILTER
+// );
+
+function handleUpdated(tabId, changeInfo, tabInfo) {
+  console.log("Updated tab: " + tabId);
+  console.log("Changed attributes: ");
+  console.log(changeInfo);
+  console.log("New tab Info: ");
+  console.log(tabInfo);  
+}
+
+browser.tabs.onUpdated.addListener(handleUpdated);
 
 function setUninstallURL() {
   const url = telemetry.createSurveyUrl(UNINSTALL_SURVEY);
