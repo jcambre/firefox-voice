@@ -1,5 +1,5 @@
+import * as serviceList from '../background/serviceList.js';
 import * as recommender from './recommender.js';
-import * as serviceList from '../serviceList.js';
 
 export let tabState;
 
@@ -13,19 +13,11 @@ export function resetState() {
             false,
             {}
         ],
-        afterAddBookmark: [
+        onAddBookmark: [
             false,
             {}
         ],
-        afterScreenshot: [
-            false,
-            {}
-        ],
-        afterCopy: [
-            false,
-            {}
-        ],
-        afterSwitchTab: [
+        onSwitchTab: [
             false,
             {}
         ],
@@ -53,27 +45,15 @@ export function resetState() {
             false,
             {}
         ],
-        onPrint: [
-            false,
-            {}
-        ],
         isArticle: [
             false,
             {}
         ],
-        didRecentSearchWithFirefoxVoice: [
-            false,
-            {}
-        ],
-        onDefaultSearchEngine: [
+        onSearch: [
             false,
             {}
         ],
         onCurrentTabClose: [
-            false,
-            {}
-        ],
-        onFullScreenMode: [
             false,
             {}
         ],
@@ -82,14 +62,6 @@ export function resetState() {
             {}
         ],
         onPinTab: [
-            false,
-            {}
-        ],
-        onReload: [
-            false,
-            {}
-        ],
-        onSaveAsPDF: [
             false,
             {}
         ],
@@ -108,25 +80,40 @@ export function resetState() {
 
 export async function handleTabUpdate(tabId, changeInfo, tabInfo) {
     // Only report once
-    console.log("helloooo?");
-    if (tabInfo.status == "complete" && changeInfo.status) {
+    console.log("helloooo?", changeInfo);
+    if ((tabInfo.status == "complete" && changeInfo.status) || ('audible' in changeInfo || 'attention' in changeInfo)) {
         resetState(); // This might be a little bit too harsh / not catch the cases where audio continues to play in a different tab, etc.
 
-        checkIsArticle();
-
+        // Perhaps these checks should be mutually exclusive? If the current tab is music, it's very likely not an article / search page as well
+        // Might want to make this all a switch statement
         const currentTabUrl = new URL(tabInfo.url);
-        checkCommentEnabledPages(currentTabUrl);
-        checkIsMusic(currentTabUrl);
-        checkIsDdgService(currentTabUrl);
+        checkSearch(currentTabUrl, tabInfo);
+        
+        checkIsArticle(tabInfo);
+
+        checkCommentEnabledPages(currentTabUrl, tabInfo);
+        checkIsMusic(currentTabUrl, tabInfo);
+        checkIsDdgService(currentTabUrl, tabInfo);
+        checkSwitchTabs(tabInfo);
+        checkTabPin(tabInfo);
 
         await recommender.recommendIfApplicable(tabId);
     }
 }
 
+function checkSearch(url, tabInfo) {
+    // I don't believe we support other search engines yet?
+    if (url.href.includes("https://www.google.com/search")) {
+        tabState.onSearch = [true, {query: url.searchParams.get('q')}];
+        return true;
+    }
+    return false;    
+}
+
 function checkIsArticle(tabInfo) {
-    if (tabInfo.isArticle) {
+    if (tabInfo.isArticle || tabInfo.isInReaderMode) {
         tabState.isArticle = [true, {}];
-        if (tabInfo.isAudible) {
+        if (tabInfo.audible) {
             tabState.isAudible = [true, {}];
         } else {
             tabState.isNotAudible = [true, {}];
@@ -154,7 +141,7 @@ function checkCommentEnabledPages(url, tabInfo) {
 function checkIsMusic(url, tabInfo) {
     if (serviceList.musicServiceNames().includes(url.hostname)) {
         tabState.onMusic = [true, {}];
-        if (tabInfo.isAudible) {
+        if (tabInfo.audible) {
             tabState.isAudible = [true, {}];
         } else {
             tabState.isNotAudible = [true, {}];
@@ -164,8 +151,24 @@ function checkIsMusic(url, tabInfo) {
     return false;
 }
 
+function checkTabPin(tabInfo) {
+    if (tabInfo.pinned) {
+        tabState.onPinTab = [true, {}];
+        return true;
+    }
+    return false;
+}
+
+function checkSwitchTabs(tabInfo) {
+    if (tabInfo.lastAccessed > (1000 * 10)) {
+        // switched back to a tab they last accessed more than 10 seconds ago -- this is going to get hit alllll the time
+        tabState.onSwitchTab = [true, {lastAccess: tabInfo.lastAccessed}];
+        return true;
+    }
+}
+
 browser.bookmarks.onCreated.addListener((id, bookmarkDetails) => {
-    tabState.afterAddBookmark = [true, {title: bookmarkDetails.title}];
+    tabState.onAddBookmark = [true, {title: bookmarkDetails.title}];
 });
 
 browser.tabs.onZoomChange.addListener(zoomChangeInfo => {
@@ -177,9 +180,9 @@ browser.tabs.onZoomChange.addListener(zoomChangeInfo => {
     }
 });
 
-browser.tabs.onRemoved.addListener(async (tabId, removeInfo) => {
-    const tabInfo = await browser.tabs.get(tabId);
-    if (tabInfo.active) {
-        tabState.onCurrentTabClose = [true, {}];
-    }
-});
+// browser.tabs.onRemoved.addListener(async (tabId, removeInfo) => {
+//     const tabInfo = await browser.tabs.get(tabId);
+//     if (tabInfo.active) {
+//         tabState.onCurrentTabClose = [true, {}];
+//     }
+// });

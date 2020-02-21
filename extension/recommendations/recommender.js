@@ -54,6 +54,15 @@ async function callAttentionToRecommendations(tabId) {
   });
 } 
 
+async function displayNotification() {
+  browser.notifications.create({
+    "type": "basic",
+    "iconUrl": browser.runtime.getURL("assets/images/favicons/icon-64.png"),
+    "title": "Try asking Firefox Voice",
+    "message": "Search for Bialetti"
+  });
+}
+
 export async function recommendIfApplicable(tabId) {
   const timeSinceLastInvoked = Date.now() - lastRecommendationTime.all;
   if (timeSinceLastInvoked < RECOMMENDATION_INTERVAL) {
@@ -66,10 +75,11 @@ export async function recommendIfApplicable(tabId) {
 
   await browser.pageAction.show(tabId);
   await callAttentionToRecommendations(tabId);
+  // await displayNotification();
   getRecommendations();
 }
 
 export function getRecommendations() {
-  console.log("CURRENT STATE", currentState.currentState);
+  console.log("CURRENT STATE", currentState.tabState);
   return recommendations;
 }
