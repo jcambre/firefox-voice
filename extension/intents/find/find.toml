@@ -14,3 +14,13 @@ phrase = "Find calendar tab"
 [[find.find.example]]
 phrase = "go to my calendar"
 test = true
+
+[[find.find.example]]
+phrase = "Find query tab"
+test = true
+expectSlots = { query = "query" }
+
+[[find.find.example]]
+phrase = "go to my query"
+test = true
+expectSlots = { query = "query" }

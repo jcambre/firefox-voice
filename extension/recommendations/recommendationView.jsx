@@ -13,13 +13,15 @@ export const recommendation = ({
     const [inputValue, setInputValue] = useState(null);
     return (
         <div id="recommendation">
-            <RecommendationHeader 
-                currentView={currentView} 
-            />
-            <RecommendationContent
-                currentView={currentView}
-                examples={examples}
-            />
+            <div id="recommendation-core">
+                <RecommendationHeader 
+                    currentView={currentView} 
+                />
+                <RecommendationContent
+                    currentView={currentView}
+                    examples={examples}
+                />
+            </div>
             <RecommendationActions
                 currentView={currentView}
                 onDismissRecommendationClick={onDismissRecommendationClick}

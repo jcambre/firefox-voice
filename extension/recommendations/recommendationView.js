@@ -17,12 +17,14 @@ export const recommendation = ({
   const [inputValue, setInputValue] = useState(null);
   return React.createElement("div", {
     id: "recommendation"
+  }, React.createElement("div", {
+    id: "recommendation-core"
   }, React.createElement(RecommendationHeader, {
     currentView: currentView
   }), React.createElement(RecommendationContent, {
     currentView: currentView,
     examples: examples
-  }), React.createElement(RecommendationActions, {
+  })), React.createElement(RecommendationActions, {
     currentView: currentView,
     onDismissRecommendationClick: onDismissRecommendationClick,
     onAcceptRecommendationClick: onAcceptRecommendationClick

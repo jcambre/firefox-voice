@@ -151,12 +151,16 @@ export async function recommendIfApplicable(tabId, tabState) {
   }
 
   await browser.pageAction.show(tabId);
-  await callAttentionToRecommendations(tabId);
-  // await displayNotification();
+  
+  if (tabState.onSearch) {
+    // await callAttentionToRecommendations(tabId);
+    await displayNotification();
+  }
   getRecommendations();
 }
 
 export function getRecommendations() {
   console.log("CURRENT STATE", currentState.tabState);
+  recommendations = ["Search Bialetti"]; // hard coded for demo purposes
   return recommendations;
 }
