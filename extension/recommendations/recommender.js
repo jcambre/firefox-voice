@@ -129,15 +129,26 @@ async function displayNotification() {
   });
 }
 
-export async function recommendIfApplicable(tabId) {
+export async function recommendIfApplicable(tabId, tabState) {
   const timeSinceLastInvoked = Date.now() - lastRecommendationTime.all;
   if (timeSinceLastInvoked < RECOMMENDATION_INTERVAL) {
     return;
   }
   const latestRecTime = Date.now();
   lastRecommendationTime.all = latestRecTime;
-  // lastRecommendationTime.article = latestRecTime;
 
+  // Determine which intents apply to the current state. We should isolate the ones which have no state criteria (i.e. wildcard "recommend whenever" intents) from those that actually do match the current situation
+  for (const [intent, criteria] of Object.entries(recommendationCriteria)) {
+    let match = true;
+    for (const criterion of criteria) {
+      if (tabState[criterion] == false) {
+        match = false;
+      }
+    }
+    if (match) {
+      console.log(`Intent ${intent} is a match for the current state!`);
+    }
+  }
 
   await browser.pageAction.show(tabId);
   await callAttentionToRecommendations(tabId);

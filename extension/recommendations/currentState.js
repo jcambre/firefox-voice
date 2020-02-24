@@ -1,7 +1,10 @@
 import * as entityTypes from '../background/entityTypes.js';
 import * as recommender from './recommender.js';
 
+const TAB_SWITCH_THRESHOLD = 5;
+
 export let tabState;
+export let tabSwitchCounter = {};
 
 export function resetState() {
     tabState = {
@@ -11,7 +14,7 @@ export function resetState() {
         onSwitchTab: false,
         onMusic: false,
         isAudible: false,
-        isNotAudible: false,
+        isNotAudible: true,
         onAnyBangService: false,
         onComplexNavigation: false,
         justUsedFirefoxVoice: false,
@@ -22,100 +25,45 @@ export function resetState() {
         onPinTab: false,
         onZoomIn: false,
         onZoomOut: false,
-        params: {}
+        params: {},
+        url: ''
     }
 }
-
 
 
 export async function handleTabUpdate(tabId, changeInfo, tabInfo) {
     // Only report once
-    console.log("helloooo?", changeInfo);
-    if ((tabInfo.status == "complete" && changeInfo.status) || ('audible' in changeInfo || 'attention' in changeInfo)) {
+    if ((tabInfo.status == "complete" && changeInfo.status) || 'audible' in changeInfo ) {
         resetState(); // This might be a little bit too harsh / not catch the cases where audio continues to play in a different tab, etc.
-
-        // Perhaps these checks should be mutually exclusive? If the current tab is music, it's very likely not an article / search page as well
-        // Might want to make this all a switch statement
         const currentTabUrl = new URL(tabInfo.url);
-        checkSearch(currentTabUrl, tabInfo);
-        
-        checkIsArticle(tabInfo);
+        tabState.url = tabInfo.url;
 
-        checkCommentEnabledPages(currentTabUrl, tabInfo);
-        checkIsMusic(currentTabUrl, tabInfo);
-        checkIsDdgService(currentTabUrl, tabInfo);
-        checkSwitchTabs(tabInfo);
-        checkTabPin(tabInfo);
-
-        await recommender.recommendIfApplicable(tabId);
-    }
-}
-
-function checkSearch(url, tabInfo) {
-    // I don't believe we support other search engines yet?
-    if (url.href.includes("https://www.google.com/search")) {
-        tabState.onSearch = true;
-        tabState.params = {query: url.searchParams.get('q')};
-        return true;
-    }
-    return false;    
-}
-
-function checkIsArticle(tabInfo) {
-    if (tabInfo.isArticle || tabInfo.isInReaderMode) {
-        tabState.isArticle = true;
         if (tabInfo.audible) {
-            tabState.isAudible = true;
-        } else {
-            tabState.isNotAudible = true;
+            tabState.audible = true;
+            tabState.isNotAudible = false;
         }
-        return true;
-    }
-    return false;
-}
-
-function checkIsDdgService(url, tabInfo) {
-    const ddgServices = entityTypes.allServiceNames.map(name => name.replace(/ /g,''));
-    if (ddgServices.includes(url.hostname)) {
-        tabState.onAnyBangService = true;
-    }
-}
-
-function checkCommentEnabledPages(url, tabInfo) {
-    if (url.hostname.includes("reddit") || url.hostname.includes("hackernews")) {
-        tabState.onCommentEnabledPage = true;
-        return true;
-    }
-    return false;
-}
-
-function checkIsMusic(url, tabInfo) {
-    if (entityTypes.musicServiceNames.includes(url.hostname)) {
-        tabState.onMusic = true;
-        if (tabInfo.audible) {
-            tabState.isAudible = true;
-        } else {
-            tabState.isNotAudible = true;
+        if (tabInfo.pinned) {
+            tabState.onPinTab = true;
         }
-        return true;
-    }
-    return false;
-}
 
-function checkTabPin(tabInfo) {
-    if (tabInfo.pinned) {
-        tabState.onPinTab = true;
-        return true;
-    }
-    return false;
-}
+        if (tabInfo.isArticle || tabInfo.isInReaderMode) {
+            tabState.isArticle = true;
+        } else if (currentTabUrl.href.includes("https://www.google.com/search")) {
+            tabState.onSearch = true;
+            tabState.params = {query: currentTabUrl.searchParams.get('q')};
+        } else if (isMusicService(currentTabUrl.hostname)) {
+            tabState.onMusic = true;
+            tabState.params = {service: currentTabUrl.hostname};
+        } else if (entityTypes.allServiceNames.map(name => name.replace(/ /g,'')).includes(currentTabUrl.hostname)) {
+            tabState.onAnyBangService = true;
+            tabState.params = {service: currentTabUrl.hostname};
+        } else if (currentTabUrl.hostname.includes("reddit") || currentTabUrl.hostname.includes("hackernews")) {
+            tabState.onCommentEnabledPage = true;
+        }
 
-function checkSwitchTabs(tabInfo) {
-    if (tabInfo.lastAccessed > (1000 * 10)) {
-        // switched back to a tab they last accessed more than 10 seconds ago -- this is going to get hit alllll the time
-        tabState.onSwitchTab = true;
-        tabState.params = {lastAccess: tabInfo.lastAccessed};
-        return true;
+        await recommender.recommendIfApplicable(tabId, tabState);
+        // await browser.storage.local.clear();
+        await logCurrentState();
     }
 }
 
@@ -133,9 +81,39 @@ browser.tabs.onZoomChange.addListener(zoomChangeInfo => {
     }
 });
 
+// Perhaps only listen to these events when 
+browser.tabs.onActivated.addListener(async (activeInfo) => {
+    const tabId = activeInfo.tabId;
+    tabSwitchCounter[activeInfo.windowId] = tabSwitchCounter[activeInfo.windowId] || {}
+    let numSwitchesToTab = tabSwitchCounter[activeInfo.windowId][tabId] || 0;
+    
+    console.log(numSwitchesToTab);
+    tabSwitchCounter[activeInfo.windowId][tabId] = ++numSwitchesToTab;
+    if (numSwitchesToTab > TAB_SWITCH_THRESHOLD) {
+        // Should determine some sort of title / identifier for the tab to suggest. Can either take the page title and use everything before the first " - ", or try using the og:site_name
+        await recommender.recommendIfApplicable(tabId, tabState);
+    }
+});
+
 // browser.tabs.onRemoved.addListener(async (tabId, removeInfo) => {
 //     const tabInfo = await browser.tabs.get(tabId);
 //     if (tabInfo.active) {
 //         tabState.onCurrentTabClose = [true, {}];
 //     }
 // });
+
+async function logCurrentState() {
+    let log = (await browser.storage.local.get("activityRecommendationLog"))["activityRecommendationLog"];
+    if (!log) {
+        log = {}
+    }
+    const timestamp = Date.now().toString();
+    log[timestamp] = tabState;
+    await browser.storage.local.set({"activityRecommendationLog": log});
+}
+
+function isMusicService(url) {
+    let musicServices = entityTypes.musicServiceNames;
+    const doesHostContainEachService = musicServices.map(name => (url).includes(name));
+    return doesHostContainEachService.some(service => service); // returns true if at least one of the service names is found within the host name
+}
