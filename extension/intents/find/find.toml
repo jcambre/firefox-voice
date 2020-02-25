@@ -18,9 +18,11 @@ test = true
 [[find.find.example]]
 phrase = "Find query tab"
 test = true
+recommendation = true
 expectSlots = { query = "query" }
 
 [[find.find.example]]
 phrase = "go to my query"
 test = true
+recommendation = true
 expectSlots = { query = "query" }

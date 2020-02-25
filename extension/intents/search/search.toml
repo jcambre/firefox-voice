@@ -74,6 +74,16 @@ phrase = "How long will it take to get to Springfield?"
 [[search.search.example]]
 phrase = "How do I get to the hardware store?"
 
+[[search.search.example]]
+phrase = "search for query"
+recommendation = true
+expectSlots = { query = "query" }
+
+[[search.search.example]]
+phrase = "do a search for query"
+recommendation = true
+expectSlots = { query = "query" }
+
 [search.searchPage]
 description = "Opens a search page"
 match = """

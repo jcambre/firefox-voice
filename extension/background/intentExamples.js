@@ -68,6 +68,29 @@ export function getExamplesForIntentCategory(category, number) {
   return result;
 };
 
+export function getExamplesForIntent(intentName, slots={}, number=2) {
+  let examplesForIntent = [];
+  const intent = intentRunner.intents[intentName];
+  console.log(intent);
+  const examples = intent.examples;
+  if (!examples) {
+    return null;
+  }
+  for (const example of examples) {
+    if (example.recommendation) {
+      let customizedExample = example.phrase;
+      if (example.expectSlots) {
+        for (const slot in example.expectSlots) {
+          console.log("the slot is ", slot, slots[slot]);
+          customizedExample = customizedExample.replace(slot, slots[slot]);
+        }
+      }
+      examplesForIntent.push(customizedExample);
+    }
+  }
+  return examplesForIntent;
+};
+
 function freshExamples(number) {
   const examplesByIntent = getAllExamples();
   const intentNames = shuffled(Object.keys(examplesByIntent));

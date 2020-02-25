@@ -9,7 +9,6 @@ export let tabSwitchCounter = {};
 export function resetState() {
     tabState = {
         onCommentEnabledPage: false,
-        onAnyPage: false,
         onAddBookmark: false,
         onSwitchTab: false,
         onMusic: false,

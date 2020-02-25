@@ -12,7 +12,11 @@ let lastRecommendationTime = {
 };
 
 let recommendations;
+let recommendableIntents;
 
+// Pruned, prioritized with scorecard on events
+// why  do we need prioritization? -- think of examples for le paper
+// adaptivity in learning science
 // These are mostly proactive, based on their current state and what they COULD do next
 const recommendationCriteria = {
   "aboutPage.changeComments": ["onCommentEnabledPage"],
@@ -79,6 +83,10 @@ const recommendationCriteria = {
   "tabs.zoomReset": []
 };
 
+// Random interval popup -- every 20, show the uncategorizable intents and say which of these would you use
+// The Y is "which of these would you pick" -- only log on the Xs for which we have Ys (i.e. ) -- and only do this for proactive ones. for reactive, you can just listen to see if they did the action
+// Collect reactive data by human: Which of these intents would be useful now? Try saying "volume up" next time. -- ask them to pick which one
+
 // This unfortunately won't work because content scripts can't modify privileged pages like about:newtab
 // async function handleNewTab(tabInfo) {
 //   lastRecommendationTime.all = 0;
@@ -137,6 +145,7 @@ export async function recommendIfApplicable(tabId, tabState) {
   const latestRecTime = Date.now();
   lastRecommendationTime.all = latestRecTime;
 
+  recommendableIntents = [];
   // Determine which intents apply to the current state. We should isolate the ones which have no state criteria (i.e. wildcard "recommend whenever" intents) from those that actually do match the current situation
   for (const [intent, criteria] of Object.entries(recommendationCriteria)) {
     let match = true;
@@ -148,13 +157,14 @@ export async function recommendIfApplicable(tabId, tabState) {
     if (match) {
       console.log(`Intent ${intent} is a match for the current state!`);
     }
+    recommendableIntents.push(intent);
   }
 
   await browser.pageAction.show(tabId);
   
   if (tabState.onSearch) {
     // await callAttentionToRecommendations(tabId);
-    await displayNotification();
+    // await displayNotification();
   }
   getRecommendations();
   await browser.tabs.insertCSS(tabId, {file: "recommendations/recommendation-wrapper.css"})
@@ -163,6 +173,7 @@ export async function recommendIfApplicable(tabId, tabState) {
 
 export function getRecommendations() {
   console.log("CURRENT STATE", currentState.tabState);
-  recommendations = ["Search Bialetti"]; // hard coded for demo purposes
+  const randomIntent = recommendableIntents[Math.floor(Math.random() * recommendableIntents.length)];
+  recommendations = intentExamples.getExamplesForIntent("search.search", {query: "coffee time"});  //currentState.tabState.params
   return recommendations;
 }
