@@ -86,6 +86,7 @@ const recommendationCriteria = {
 // Random interval popup -- every 20, show the uncategorizable intents and say which of these would you use
 // The Y is "which of these would you pick" -- only log on the Xs for which we have Ys (i.e. ) -- and only do this for proactive ones. for reactive, you can just listen to see if they did the action
 // Collect reactive data by human: Which of these intents would be useful now? Try saying "volume up" next time. -- ask them to pick which one
+// When there's only one relevant intent, show the intent + none of the above
 
 // This unfortunately won't work because content scripts can't modify privileged pages like about:newtab
 // async function handleNewTab(tabInfo) {
