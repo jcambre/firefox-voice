@@ -30,6 +30,9 @@ export const RecommendationController = function () {
   const onDismissRecommendationClick = async () => {
     // TODO: Log that the dismiss button was clicked
     window.close();
+    browser.runtime.sendMessage({
+      type: "dismissRecommendation"
+    });
   };
 
   const onAcceptRecommendationClick = async () => {
@@ -38,6 +41,9 @@ export const RecommendationController = function () {
       type: "triggerPopupFromRecommendation"
     });
     window.close();
+    browser.runtime.sendMessage({
+      type: "dismissRecommendation"
+    });
   };
 
   return React.createElement(recommendationView.recommendation, {

@@ -157,6 +157,8 @@ export async function recommendIfApplicable(tabId, tabState) {
     await displayNotification();
   }
   getRecommendations();
+  await browser.tabs.insertCSS(tabId, {file: "recommendations/recommendation-wrapper.css"})
+  await browser.tabs.sendMessage(tabId, {type: "onRecommendablePage"});
 }
 
 export function getRecommendations() {

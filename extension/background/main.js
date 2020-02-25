@@ -50,6 +50,8 @@ browser.runtime.onMessage.addListener(async (message, sender) => {
     return intentExamples.getExamplesForIntentCategory(message.category, message.number || 2);
   } else if (message.type === "getRecommendations") {
     return recommender.getRecommendations();
+  } else if (message.type === "dismissRecommendation") {
+    return browser.tabs.sendMessage(sender.tab.id, {type: "dismissRecommendation"});
   } else if (message.type === "getLastIntentForFeedback") {
     return intentRunner.getLastIntentForFeedback();
   } else if (message.type === "inDevelopment") {
@@ -84,6 +86,8 @@ browser.runtime.onMessage.addListener(async (message, sender) => {
     return copyImage(message.url);
   } else if (message.type === "wakeword") {
     return wakewordPopup(message.wakeword);
+  } else if(message.type === "triggerPopupFromRecommendation") {
+    return browser.experiments.voice.openPopup();
   } else if (message.type === "createSurveyUrl") {
     return telemetry.createSurveyUrl(message.url);
   } else if (message.type === "voiceShimForward") {

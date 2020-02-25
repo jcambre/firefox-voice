@@ -26,6 +26,9 @@
   <% if (!env.ANDROID) { %>
     "incognito": "not_allowed",
   <% } %>
+  "web_accessible_resources": [
+    "recommendations/recommendation.html"
+  ],
   "background": {
     "scripts": [
       "buildSettings.js",
@@ -48,6 +51,14 @@
       "run_at": "document_start"
     }
   ],  
+  <% } else { %>
+    "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["recommendations/inPageRecommender.js"],
+      "match_about_blank": true
+    }
+  ],    
   <% } %>
   "experiment_apis": {
     "voice": {

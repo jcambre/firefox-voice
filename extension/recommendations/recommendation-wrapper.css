@@ -1,0 +1,48 @@
+#fx-voice-recommendation-iframe {
+    all: unset;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 100000000;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 0.5em;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    animation: 0.7s slidein 0s forwards, 1s fadeout 10s forwards;
+}
+
+#fx-voice-recommendation-iframe:hover {
+    animation: 0s slidein 0s forwards;
+}
+
+@keyframes slidein {
+    from {
+      margin-right: -20%;
+    }
+  
+    to {
+      margin-right: 10px;
+      right: 0px;
+    }
+  }
+
+
+@keyframes fadeout {
+    0% {
+        pointer-events: auto;
+        visibility: visible;
+        opacity: 1; 
+    }
+
+    99% {
+        pointer-events: auto;
+        visibility: visible;
+        opacity: 0;
+    }
+
+    100% {
+        visibility: hidden;
+        pointer-events: none;
+        opacity: 0;
+    }
+}

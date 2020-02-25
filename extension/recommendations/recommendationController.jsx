@@ -31,12 +31,14 @@ export const RecommendationController = function () {
     const onDismissRecommendationClick = async () => {
         // TODO: Log that the dismiss button was clicked
         window.close();
+        browser.runtime.sendMessage({type: "dismissRecommendation"});
     };
 
     const onAcceptRecommendationClick = async () => {
         // TODO: Log that the dismiss button was clicked
         browser.runtime.sendMessage({type: "triggerPopupFromRecommendation"});
         window.close();
+        browser.runtime.sendMessage({type: "dismissRecommendation"});
     };
 
     return (
