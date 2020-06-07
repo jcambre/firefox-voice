@@ -21,21 +21,21 @@ async function startWatchword(keywords, sensitivity) {
     console.log(result);
     const words = transferRecognizer.wordLabels();
     console.log(words);
-    // `result.scores` contains the scores for the new words, not the original
-    // words.
-    for (let i = 0; i < words.length; ++i) {
-        console.log(`score for word '${words[i]}' = ${result.scores[i]}`);
-    }
+
+    const maxConfidence = Math.max(...result.scores);
+    const topWord = words[result.scores.indexOf(maxConfidence)];
+    console.log(`Predicted word ${topWord} with confidence ${maxConfidence}`);
+    const wakeword = topWord === "heyff" ? "Hey Firefox" : "Next slide please";
     await browser.runtime.sendMessage({
       type: "wakeword",
-      wakeword: "Hey Firefox",
+      wakeword
     });
     // - result.scores contains the probability scores that correspond to
     //   recognizer.wordLabels().
     // - result.spectrogram contains the spectrogram of the recognized word.
     }, {
     probabilityThreshold: 0.85,
-    overlapFactor: 0.00001
+    overlapFactor: 0.1
   });
 
 
