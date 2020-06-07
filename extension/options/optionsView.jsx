@@ -127,6 +127,9 @@ const General = ({
   userSettings,
   updateUserSettings,
 }) => {
+  console.log("whattt");
+  console.log(userOptions);
+  console.log(inDevelopment);
   return (
     <div className="settings-content">
       <PreferenceSettings
@@ -138,7 +141,7 @@ const General = ({
         updateUserSettings={updateUserSettings}
         keyboardShortcutError={keyboardShortcutError}
       />
-      {inDevelopment && userOptions.wakeword && userOptions.wakewords.length ? (
+      {inDevelopment ? (
         <WakewordSettings
           userOptions={userOptions}
           userSettings={userSettings}
