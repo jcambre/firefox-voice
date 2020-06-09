@@ -1,6 +1,6 @@
 /* globals log, tf, speechCommands */
 
-import * as settings from "../settings.js";
+import * as settings from "../settings.js"; 
 
 let enabled = false;
 let transferRecognizer;
