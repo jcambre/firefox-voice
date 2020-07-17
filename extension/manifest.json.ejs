@@ -35,6 +35,12 @@
       "js/vendor/chrono.min.js"
     ]
   },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/websiteIntent.js"]
+    }
+  ],
   "experiment_apis": {
     "voice": {
       "schema": "experiments/voice/schema.json",
