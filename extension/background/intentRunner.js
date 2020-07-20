@@ -9,6 +9,7 @@ import * as settings from "../settings.js";
 import { entityTypes } from "./entityTypes.js";
 import * as intentParser from "./intentParser.js";
 import * as telemetry from "./telemetry.js";
+import * as content from "./content.js";
 import { registerHandler, sendMessage } from "./communicate.js";
 
 const FEEDBACK_INTENT_TIME_LIMIT = 1000 * 60 * 60 * 24; // 24 hours
@@ -281,6 +282,28 @@ export function setLastIntent(intent) {
 
 export async function runUtterance(utterance, noPopup) {
   log.timing(`intentRunner.runUtterance(${utterance}) called`);
+  // Inject content script into the current tab and check for page-level intents. This should probably happen only if there are no supported intents (i.e. non-fallback) that match the query
+  const activeTab = await browserUtil.activeTab();
+  await content.inject(activeTab.id, [
+    "/realtime-intents/detectWebpageIntents.js",
+  ]);
+  const webpageIntents = await browser.tabs.sendMessage(activeTab.id, {type: "scanForIntents"});
+  console.log(webpageIntents);
+  for (const intent in webpageIntents) {
+    console.log(intent);
+    const re = new RegExp(`\\b${intent}\\b`, "i");
+    if (re.test(utterance)) {
+      const context = {
+        name: "external.run",
+        slots: { response: webpageIntents[intent] },
+        parameters: {},
+        utterance: intent,
+        fallback: false,
+      }
+      await runIntent(context);
+      return true;
+    }
+  }
   for (const name in registeredNicknames) {
     const re = new RegExp(`\\b${name}\\b`, "i");
     if (re.test(utterance)) {
