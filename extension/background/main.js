@@ -106,6 +106,8 @@ browser.runtime.onMessage.addListener(async (message, sender) => {
       context = new intentRunner.IntentContext(context);
     }
     return intentRunner.registerNickname(message.name, context);
+  } else if (message.type === "registerWebsiteIntent") {
+    return intentRunner.registerWebsiteIntent(message.intents);
   } else if (message.type === "parseUtterance") {
     return new intentRunner.IntentContext(
       intentParser.parse(message.utterance, message.disableFallback)

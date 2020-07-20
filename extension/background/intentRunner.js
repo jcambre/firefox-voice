@@ -279,6 +279,22 @@ export function setLastIntent(intent) {
 
 export async function runUtterance(utterance, noPopup) {
   log.timing(`intentRunner.runUtterance(${utterance}) called`);
+  console.log(websiteIntents);
+  for (const intent in websiteIntents) {
+    console.log(intent);
+    const re = new RegExp(`\\b${intent}\\b`, "i");
+    if (re.test(utterance)) {
+      const context = {
+        name: "external.run",
+        slots: { response: websiteIntents[intent] },
+        parameters: {},
+        utterance: intent,
+        fallback: false,
+      }
+      await runIntent(context);
+      return true;
+    }
+  }
   for (const name in registeredNicknames) {
     const re = new RegExp(`\\b${name}\\b`, "i");
     if (re.test(utterance)) {
@@ -455,6 +471,17 @@ export function getIntentHistory() {
 }
 
 const registeredNicknames = {};
+
+const websiteIntents = {}
+
+export function registerWebsiteIntent(intents) {
+  console.log("OMG I GOT HERE AND INTENTS ARE ");
+  console.log(intents);
+  for (const intent of intents) {
+    const utterance = intent.queryText.toLowerCase();
+    websiteIntents[utterance] = intent.response;
+  }
+}
 
 export function registerNickname(name, context) {
   name = name.toLowerCase();
