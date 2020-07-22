@@ -1,0 +1,8 @@
+[external.run]
+description = "Run an external intent"
+match = """
+  asdfasdfasfdadf
+"""
+
+[[external.run.example]]
+phrase = "asdfasdfasfdadf"

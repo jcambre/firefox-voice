@@ -289,15 +289,20 @@ export async function runUtterance(utterance, noPopup) {
   ]);
   const webpageIntents = await browser.tabs.sendMessage(activeTab.id, {type: "scanForIntents"});
   console.log(webpageIntents);
-  for (const intent in webpageIntents) {
+  for (const intent of webpageIntents) {
     console.log(intent);
-    const re = new RegExp(`\\b${intent}\\b`, "i");
+    const re = new RegExp(`\\b${intent.queryText}\\b`, "i");
     if (re.test(utterance)) {
       const context = {
         name: "external.run",
-        slots: { response: webpageIntents[intent] },
+        slots: { 
+          type: intent.type,
+          response: intent.response,
+          functionName: intent.functionName,
+          activeTabId: activeTab.id,
+        },
         parameters: {},
-        utterance: intent,
+        utterance: intent.queryText,
         fallback: false,
       }
       await runIntent(context);
