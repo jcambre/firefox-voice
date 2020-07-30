@@ -1,0 +1,12 @@
+[briefings.news]
+description = "Get the News flash briefing from the BBC"
+match = """
+  (what is| what's) the (latest |) (bbc |) news (from the bbc |)
+  update me
+"""
+
+[[briefings.news.example]]
+phrase = "what is the news"
+
+[[briefings.news.example]]
+phrase = "update me"

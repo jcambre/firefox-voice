@@ -188,6 +188,11 @@ export const PopupController = function() {
     }, 3000);
   };
 
+  const playExternalAudio = audioUrl => {
+    const audio = new Audio(audioUrl);
+    audio.play();
+  }
+
   const onClickLexicon = async event => {
     await browserUtil.openOrActivateTab(
       browser.runtime.getURL(event.target.href)
@@ -294,6 +299,10 @@ export const PopupController = function() {
           return Promise.resolve(null);
         }
         return Promise.resolve(lastAudio);
+      }
+      case "playExternalAudio": {
+        playExternalAudio(message.audioUrl);
+        return Promise.resolve(true);
       }
       default:
         break;
