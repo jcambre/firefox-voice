@@ -1,5 +1,5 @@
 [briefings.news]
-description = "Get the News flash briefing from the BBC"
+description = "Get the latest (full) news report from the BBC"
 match = """
   (what is| what's) the (latest |) (bbc |) news (from the bbc |)
   update me
@@ -10,3 +10,26 @@ phrase = "what is the news"
 
 [[briefings.news.example]]
 phrase = "update me"
+
+[briefings.sports]
+description = "Get the latest sports report from the BBC"
+match = """
+  (what is| what's) (the |) (latest |) sports news (from the bbc |)
+  (what is |what's ) happening in sports
+"""
+
+[[briefings.sports.example]]
+phrase = "sports news"
+
+[[briefings.sports.example]]
+phrase = "what's happening in sports"
+
+[briefings.flash]
+description = "Get the latest 60 second flash news briefing from the BBC"
+match = """
+  flash briefing
+  BBC minute
+"""
+
+[[briefings.flash.example]]
+phrase = "flash briefing"
