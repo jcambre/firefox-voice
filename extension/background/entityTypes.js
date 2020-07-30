@@ -21,9 +21,19 @@ for (const id in metadata.music) {
   }
 }
 
+export const radioServiceNames = [];
+
+for (const id in metadata.radio) {
+  const item = metadata.radio[id];
+  for (const name of item.names) {
+    radioServiceNames.push(name);
+  }
+}
+
 export const entityTypes = convertEntities({
   serviceName: allServiceNames,
   musicServiceName: musicServiceNames,
+  radioServiceName: radioServiceNames,
   lang: languageNames(),
   smallNumber: English.numberNames,
 });

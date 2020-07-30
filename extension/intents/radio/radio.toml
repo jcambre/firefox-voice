@@ -1,0 +1,12 @@
+[radio.playStation]
+description = "Play a particular BBC radio station"
+match = """
+  radio [service:radioServiceName]
+"""
+
+[[radio.playStation.example]]
+phrase = "radio northampton"
+
+[[radio.playStation.example]]
+phrase = "radio cumbria"
+test = true

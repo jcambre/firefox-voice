@@ -59,7 +59,7 @@ export const metadata = ${JSON.stringify(metadata, null, "  ")};\n`;
 
 writeFile(OUTPUT, fileContent, true);
 
-const serviceMetadata = { search: {}, music: {}, email: {} };
+const serviceMetadata = { search: {}, music: {}, email: {}, radio: {} };
 
 for (const filename of glob.sync(SERVICE_DIR + "/*/*.toml")) {
   let data;
@@ -75,8 +75,8 @@ for (const filename of glob.sync(SERVICE_DIR + "/*/*.toml")) {
   const name = Object.keys(data)[0];
   const type = data[name].type;
   data[name].names = (data[name].names || []).concat([name]);
-  if (type !== "music" && type !== "email") {
-    throw new Error(`Expected type=music/email in ${filename}`);
+  if (type !== "music" && type !== "email" && type !== "radio") {
+    throw new Error(`Expected type=music/email/radio in ${filename}`);
   }
   delete data[name].type;
   Object.assign(serviceMetadata[type], data);
@@ -96,6 +96,21 @@ for (const name in searchData) {
   searchData[name].names = (searchData[name].names || []).concat([name]);
 }
 Object.assign(serviceMetadata.search, searchData);
+
+let radioData;
+const radioDataFilename = SERVICE_DIR + "/radioServices.toml";
+
+try {
+  radioData = toml.parse(fs.readFileSync(radioDataFilename));
+} catch (e) {
+  console.warn("Error:", e, "in file:", radioDataFilename);
+  throw e;
+}
+
+for (const name in radioData) {
+  radioData[name].names = (radioData[name].names || []).concat([name]);
+}
+Object.assign(serviceMetadata.radio, radioData);
 
 const serviceContent = `// Generated from ${path.basename(searchDataFilename)}
 export const metadata = ${JSON.stringify(serviceMetadata, null, "  ")};\n`;

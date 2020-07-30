@@ -1,0 +1,227 @@
+["radio one"]
+stationUrl = "https://www.bbc.co.uk/radio1"
+stationName = "Radio 1"
+
+["one extra"]
+stationUrl = "https://www.bbc.co.uk/1xtra"
+stationName = "Radio 1Xtra"
+
+["radio two"]
+stationUrl = "https://www.bbc.co.uk/radio2"
+stationName = "Radio 2"
+
+["radio three"]
+stationUrl = "https://www.bbc.co.uk/radio3"
+stationName = "Radio 3"
+
+["radio four"]
+stationUrl = "https://www.bbc.co.uk/radio4"
+stationName = "Radio 4"
+
+["radio four extra"]
+stationUrl = "https://www.bbc.co.uk/radio4extra"
+stationName = "Radio 4Extra"
+
+["radio five live"]
+stationUrl = "https://www.bbc.co.uk/5live"
+stationName = "Radio 5 live"
+
+["radio five live sports extra"]
+stationUrl = "https://www.bbc.co.uk/5livesportsextra"
+stationName = "Radio 5 live sports extra"
+
+["radio six music"]
+stationUrl = "https://www.bbc.co.uk/6music"
+stationName = "Radio 6 Music"
+
+["asian network"]
+stationUrl = "https://www.bbc.co.uk/asiannetwork"
+stationName = "Asian Network"
+
+["world service"]
+stationUrl = "https://www.bbc.co.uk/worldserviceradio"
+stationName = "World Service"
+
+["radio scotland"]
+stationUrl = "https://www.bbc.co.uk/radioscotland"
+stationName = "Radio Scotland"
+
+["radio nan gaidheal"]
+stationUrl = "https://www.bbc.co.uk/radionangaidheal"
+stationName = "Radio nan Gàidheal"
+
+["radio ulster"]
+stationUrl = "https://www.bbc.co.uk/radioulster"
+stationName = "Radio Ulster"
+
+["radio foyle"]
+stationUrl = "https://www.bbc.co.uk/radiofoyle"
+stationName = "Radio Foyle"
+
+["radio wales"]
+stationUrl = "https://www.bbc.co.uk/radiowales"
+stationName = "Radio Wales"
+
+["radio cymru"]
+stationUrl = "https://www.bbc.co.uk/radiocymru"
+stationName = "Radio Cymru"
+
+["berkshire"]
+stationUrl = "https://www.bbc.co.uk/radioberkshire"
+stationName = "BBC Radio Berkshire"
+
+["bristol"]
+stationUrl = "https://www.bbc.co.uk/radiobristol"
+stationName = "BBC Radio Bristol"
+
+["cambridgeshire"]
+stationUrl = "https://www.bbc.co.uk/radiocambridgeshire"
+stationName = "BBC Radio Cambridgeshire"
+
+["cornwall"]
+stationUrl = "https://www.bbc.co.uk/radiocornwall"
+stationName = "BBC Radio Cornwall"
+
+["coventry and warwickshire"]
+stationUrl = "https://www.bbc.co.uk/bbccoventryandwarwickshire"
+stationName = "BBC Coventry & Warwickshire"
+
+["cumbria"]
+stationUrl = "https://www.bbc.co.uk/radiocumbria"
+stationName = "BBC Radio Cumbria"
+
+["derby"]
+stationUrl = "https://www.bbc.co.uk/radioderby"
+stationName = "BBC Radio Derby"
+
+["devon"]
+stationUrl = "https://www.bbc.co.uk/radiodevon"
+stationName = "BBC Radio Devon"
+
+["essex"]
+stationUrl = "https://www.bbc.co.uk/bbcessex"
+stationName = "BBC Essex"
+
+["gloucestershire"]
+stationUrl = "https://www.bbc.co.uk/radiogloucestershire"
+stationName = "BBC Radio Gloucestershire"
+
+["guernsey"]
+stationUrl = "https://www.bbc.co.uk/radioguernsey"
+stationName = "BBC Radio Guernsey"
+
+["hereford and worcester"]
+stationUrl = "https://www.bbc.co.uk/bbcherefordandworcester"
+stationName = "BBC Hereford & Worcester"
+
+["humberside"]
+stationUrl = "https://www.bbc.co.uk/radiohumberside"
+stationName = "BBC Radio Humberside"
+
+["jersey"]
+stationUrl = "https://www.bbc.co.uk/radiojersey"
+stationName = "BBC Radio Jersey"
+
+["kent"]
+stationUrl = "https://www.bbc.co.uk/radiokent"
+stationName = "BBC Radio Kent"
+
+["lancashire"]
+stationUrl = "https://www.bbc.co.uk/radiolancashire"
+stationName = "BBC Radio Lancashire"
+
+["leeds"]
+stationUrl = "https://www.bbc.co.uk/radioleeds"
+stationName = "BBC Radio Leeds"
+
+["leicester"]
+stationUrl = "https://www.bbc.co.uk/radioleicester"
+stationName = "BBC Radio Leicester"
+
+["lincolnshire"]
+stationUrl = "https://www.bbc.co.uk/radiolincolnshire"
+stationName = "BBC Radio Lincolnshire"
+
+["london"]
+stationUrl = "https://www.bbc.co.uk/radiolondon"
+stationName = "BBC Radio London"
+
+["manchester"]
+stationUrl = "https://www.bbc.co.uk/radiomanchester"
+stationName = "BBC Radio Manchester"
+
+["merseyside"]
+stationUrl = "https://www.bbc.co.uk/radiomerseyside"
+stationName = "BBC Radio Merseyside"
+
+["newcastle"]
+stationUrl = "https://www.bbc.co.uk/bbcnewcastle"
+stationName = "BBC Newcastle"
+
+["norfolk"]
+stationUrl = "https://www.bbc.co.uk/radionorfolk"
+stationName = "BBC Radio Norfolk"
+
+["northampton"]
+stationUrl = "https://www.bbc.co.uk/radionorthampton"
+stationName = "BBC Radio Northampton"
+
+["nottingham"]
+stationUrl = "https://www.bbc.co.uk/radionottingham"
+stationName = "BBC Radio Nottingham"
+
+["oxford"]
+stationUrl = "https://www.bbc.co.uk/radiooxford"
+stationName = "BBC Radio Oxford"
+
+["sheffield"]
+stationUrl = "https://www.bbc.co.uk/radiosheffield"
+stationName = "BBC Radio Sheffield"
+
+["shropshire"]
+stationUrl = "https://www.bbc.co.uk/radioshropshire"
+stationName = "BBC Radio Shropshire"
+
+["solent"]
+stationUrl = "https://www.bbc.co.uk/radiosolent"
+stationName = "BBC Radio Solent"
+
+["somerset"]
+stationUrl = "https://www.bbc.co.uk/bbcsomerset"
+stationName = "BBC Somerset"
+
+["stoke"]
+stationUrl = "https://www.bbc.co.uk/radiostoke"
+stationName = "BBC Radio Stoke"
+
+["suffolk"]
+stationUrl = "https://www.bbc.co.uk/radiosuffolk"
+stationName = "BBC Radio Suffolk"
+
+["surrey"]
+stationUrl = "https://www.bbc.co.uk/bbcsurrey"
+stationName = "BBC Surrey"
+
+["sussex"]
+stationUrl = "https://www.bbc.co.uk/bbcsussex"
+stationName = "BBC Sussex"
+
+["tees"]
+stationUrl = "https://www.bbc.co.uk/bbctees"
+stationName = "BBC Tees"
+
+["three counties radio"]
+stationUrl = "https://www.bbc.co.uk/threecountiesradio"
+stationName = "BBC Three Counties Radio"
+
+["wiltshire"]
+stationUrl = "https://www.bbc.co.uk/bbcwiltshire"
+stationName = "BBC Wiltshire"
+
+["wm"]
+stationUrl = "https://www.bbc.co.uk/wm"
+stationName = "BBC WM 95.6"
+
+["radio york"]
+stationUrl = "https://www.bbc.co.uk/radioyork"
+stationName = "BBC Radio York"
