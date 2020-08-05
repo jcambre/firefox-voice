@@ -1,9 +1,8 @@
 [briefings.news]
 description = "Get the latest (full) news report from the BBC"
 match = """
-  (what is| what's) the (latest |) (bbc |) news (from the bbc |)
-  update me
+  play radio one
 """
 
 [[briefings.news.example]]
-phrase = "what is the news"
+phrase = "play radio one"
