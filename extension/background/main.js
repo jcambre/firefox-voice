@@ -13,11 +13,7 @@ import * as serviceImport from "./serviceImport.js";
 import { temporaryMute, temporaryUnmute } from "../intents/muting/muting.js";
 import { focusSearchResults } from "../intents/search/search.js";
 import { copyImage } from "../intents/clipboard/clipboard.js";
-import {
-  registerOnMessage,
-  registerHandler,
-  sendMessage,
-} from "./communicate.js";
+import { registerHandler, sendMessage } from "../communicate.js";
 
 // These are used for registering message handlers:
 // eslint-disable-next-line no-unused-vars
@@ -25,8 +21,6 @@ import * as intentExamples from "./intentExamples.js";
 
 const UNINSTALL_SURVEY =
   "https://qsurvey.mozilla.com/s3/Firefox-Voice-Exit-Survey";
-
-registerOnMessage();
 
 let _inDevelopment;
 export function inDevelopment() {
@@ -234,10 +228,10 @@ updateKeyboardShortcut(settings.getSettings().keyboardShortcut);
 let wakewordMaybeOpen = false;
 
 const openWakeword = util.serializeCalls(async function() {
-  const { enableWakeword, wakewords } = await settings.getSettings();
+  const { enableWakeword } = await settings.getSettings();
   const wakewordUrl = browser.runtime.getURL("/wakeword/wakeword.html");
   const tabs = await browser.tabs.query({ url: wakewordUrl });
-  if (!enableWakeword || !wakewords.length) {
+  if (!enableWakeword) {
     if (wakewordMaybeOpen) {
       wakewordMaybeOpen = false;
       if (tabs.length) {
@@ -257,9 +251,29 @@ const openWakeword = util.serializeCalls(async function() {
     await sendMessage({ type: "updateWakeword" }, { tabId: tab.id });
     await browserUtil.makeTabActive(activeTab.id);
   } else {
-    await sendMessage({ type: "updateWakeword" }, { tabId: tabs[0].id });
+    try {
+      await sendMessage({ type: "updateWakeword" }, { tabId: tabs[0].id });
+    } catch (e) {
+      if (e.message.includes("Could not establish connection")) {
+        await browser.tabs.reload(tabs[0].id);
+      }
+      throw e;
+    }
   }
   wakewordMaybeOpen = true;
+});
+
+registerHandler("focusWakewordTab", async (message, sender) => {
+  const tab = await browserUtil.activeTab();
+  // For some reason this takes a long time to return, too long, and
+  // doesn't return in time, so we let it run in the background and return
+  // the tab.id fast:
+  browserUtil.makeTabActive(sender.tab.id);
+  return tab.id;
+});
+
+registerHandler("unfocusWakewordTab", async message => {
+  await browserUtil.makeTabActive(message.tabId);
 });
 
 // These message handlers are kept in main.js to avoid cases where the module
@@ -333,7 +347,11 @@ settings.watch("enableWakeword", openWakeword);
 settings.watch("wakewords", openWakeword);
 settings.watch("wakewordSensitivity", openWakeword);
 
-openWakeword();
+// If the wakeword is opened too soon, there can be a permission-related race condition
+// where the wakeword page won't load:
+setTimeout(() => {
+  openWakeword();
+}, 500);
 
 function setUninstallURL() {
   const url = telemetry.createSurveyUrl(UNINSTALL_SURVEY);

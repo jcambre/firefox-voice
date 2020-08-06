@@ -1,8 +1,7 @@
 /* globals catcher, chrono */
 
 import * as intentRunner from "../../background/intentRunner.js";
-import { registerHandler } from "../../background/communicate.js";
-import { sendMessage } from "../../background/communicate.js";
+import { registerHandler, sendMessage } from "../../communicate.js";
 
 class TimerController {
   constructor() {
@@ -135,7 +134,10 @@ intentRunner.registerIntent({
       e.displayMessage = "Only one timer can be active.";
       throw e;
     }
-
+    if (context.parameters.suffixTime !== undefined) {
+      context.slots.time =
+        context.slots.time + " " + context.parameters.suffixTime;
+    }
     context.keepPopup();
     const result = chrono.parse(context.slots.time);
 

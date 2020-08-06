@@ -1,13 +1,13 @@
+import * as content from "../../background/content.js";
 import * as intentRunner from "../../background/intentRunner.js";
-import * as serviceList from "../../background/serviceList.js";
 import * as languages from "../../background/languages.js";
 import * as pageMetadata from "../../background/pageMetadata.js";
-import * as searching from "../../searching.js";
-import * as content from "../../background/content.js";
+import * as serviceList from "../../background/serviceList.js";
 import * as browserUtil from "../../browserUtil.js";
+import * as searching from "../../searching.js";
 import { metadata } from "../../services/metadata.js";
 import { performSearchPage } from "../search/search.js";
-import { sendMessage } from "../../background/communicate.js";
+import { sendMessage } from "../../communicate.js";
 
 const QUERY_DATABASE_EXPIRATION = 1000 * 60 * 60 * 24 * 30; // 30 days
 const queryDatabase = new Map();
@@ -77,7 +77,7 @@ intentRunner.registerIntent({
 });
 
 intentRunner.registerIntent({
-  name: "navigation.bangSearch",
+  name: "navigation.serviceSearch",
   async run(context) {
     let service = context.slots.service || context.parameters.service;
     let tab = undefined;
@@ -89,7 +89,7 @@ intentRunner.registerIntent({
     }
 
     if (service !== null) {
-      myurl = await searching.ddgBangSearchUrl(context.slots.query, service);
+      myurl = await searching.ddgServiceSearchUrl(context.slots.query, service);
 
       context.addTelemetryServiceName(
         `ddg:${searching.ddgBangServiceName(service)}`
@@ -181,7 +181,7 @@ intentRunner.registerIntent({
     const activeTab = await browserUtil.activeTab();
     await content.inject(activeTab.id, [
       "/js/vendor/fuse.js",
-      "/intents/navigation/followLink.js",
+      "/intents/navigation/followLink.content.js",
     ]);
     const found = await browser.tabs.sendMessage(activeTab.id, {
       type: "followLink",
@@ -196,10 +196,30 @@ intentRunner.registerIntent({
 });
 
 intentRunner.registerIntent({
+  name: "navigation.signInAndOut",
+  async run(context) {
+    const activeTab = await browserUtil.activeTab();
+    await content.inject(activeTab.id, [
+      "/intents/navigation/clickLoginAndOut.js",
+    ]);
+    const found = await browser.tabs.sendMessage(activeTab.id, {
+      type: "signInAndOut",
+    });
+    if (found === false) {
+      const exc = new Error("No link found matching query");
+      exc.displayMessage = `Sorry can't "${context.utterance}" on this page`;
+      throw exc;
+    }
+  },
+});
+
+intentRunner.registerIntent({
   name: "navigation.closeDialog",
   async run(context) {
     const activeTab = await browserUtil.activeTab();
-    await content.inject(activeTab.id, ["/intents/navigation/closeDialog.js"]);
+    await content.inject(activeTab.id, [
+      "/intents/navigation/closeDialog.content.js",
+    ]);
     const found = await browser.tabs.sendMessage(activeTab.id, {
       type: "closeDialog",
     });

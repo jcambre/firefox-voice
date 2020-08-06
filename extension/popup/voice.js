@@ -3,12 +3,14 @@
 import * as util from "../util.js";
 import * as vad from "./vad.js";
 import * as settings from "../settings.js";
-import { sendMessage } from "../background/communicate.js";
+import { sendMessage } from "../communicate.js";
 
 const STT_SERVER_URL =
   buildSettings.sttServer || "https://speaktome-2.services.mozilla.com";
 const DEEP_SPEECH_URL = buildSettings.deepSpeechServer;
-const LANGUAGE = "en-US";
+
+const locale = settings.getSettings().userLocale || navigator.language;
+const LANGUAGE = locale && locale.startsWith("en-") ? locale : "en-US";
 
 export class Recorder {
   constructor(stream) {
