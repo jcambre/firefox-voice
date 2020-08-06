@@ -10,7 +10,6 @@ import { entityTypes } from "./entityTypes.js";
 import * as intentParser from "./intentParser.js";
 import * as telemetry from "./telemetry.js";
 import * as content from "./content.js";
-import { registerHandler, sendMessage } from "./communicate.js";
 import { registerHandler, sendMessage } from "../communicate.js";
 
 const FEEDBACK_INTENT_TIME_LIMIT = 1000 * 60 * 60 * 24; // 24 hours
@@ -286,7 +285,7 @@ export async function runUtterance(utterance, noPopup) {
   // Inject content script into the current tab and check for page-level intents. This should probably happen only if there are no supported intents (i.e. non-fallback) that match the query
   const activeTab = await browserUtil.activeTab();
   await content.inject(activeTab.id, [
-    "/realtime-intents/detectWebpageIntents.js",
+    "/realtime-intents/detectWebpageIntents.content.js",
   ]);
   const webpageIntents = await browser.tabs.sendMessage(activeTab.id, {type: "scanForIntents"});
   console.log(webpageIntents);

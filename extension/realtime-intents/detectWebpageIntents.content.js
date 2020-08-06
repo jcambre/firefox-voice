@@ -1,5 +1,7 @@
+import { registerHandler } from "../communicate.js";
+
 (function() {
-    communicate.register("scanForIntents", async message => {
+    registerHandler("scanForIntents", async message => {
         console.log("HERE I AM");
     
         let intents = [];
@@ -32,7 +34,7 @@
         return intents;
     });
 
-    communicate.register("runFunction", async message => {
+    registerHandler("runFunction", async message => {
         console.log("at least i got here");
         console.log(message);
         const functionName = message.functionName;
