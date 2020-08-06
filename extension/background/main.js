@@ -342,6 +342,10 @@ registerHandler("makeRecorderActive", (message, sender) => {
   browserUtil.makeTabActive(recorderTabId || sender.tab.id);
   return null;
 });
+registerHandler("registerWebsiteIntent", message => {
+  message.type = "onRegisterWebsite";
+  return intentRunner.registerWebsiteIntent(message.intents);
+});
 
 settings.watch("enableWakeword", openWakeword);
 settings.watch("wakewords", openWakeword);

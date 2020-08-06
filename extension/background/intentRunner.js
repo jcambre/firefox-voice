@@ -281,7 +281,6 @@ export function setLastIntent(intent) {
 
 export async function runUtterance(utterance, noPopup) {
   log.timing(`intentRunner.runUtterance(${utterance}) called`);
-<<<<<<< HEAD
   console.log(websiteIntents);
   for (const intent in websiteIntents) {
     console.log(intent);
@@ -298,10 +297,7 @@ export async function runUtterance(utterance, noPopup) {
       return true;
     }
   }
-  for (const name in registeredNicknames) {
-=======
   for (const name in registeredRoutines) {
->>>>>>> 8b3dc93bee6ffd6acdbbf49d5ab9edd64c50b51b
     const re = new RegExp(`\\b${name}\\b`, "i");
     if (re.test(utterance)) {
       const repl = utterance.replace(re, "routine");
