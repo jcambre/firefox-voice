@@ -5,6 +5,7 @@ if [[ ! -d honkling ]] ; then
   echo "Enter to clone (^C to abort)"
   read x
   git clone --branch hey_firefox https://github.com/castorini/honkling.git honkling
+  cd honkling
   git submodule update --init --recursive
 fi
 
@@ -40,6 +41,8 @@ lib/meyda.js
 for file in $files ; do
   cp $file $dest
 done
+
+git describe --all --long --always > $dest/revision.txt
 
 cd ..
 echo "Honkling files copied"

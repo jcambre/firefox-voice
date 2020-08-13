@@ -3,6 +3,7 @@
 // For some reason, eslint is not detecting that <Variable /> means that Variable is used
 
 import * as browserUtil from "../browserUtil.js";
+import { getSettingsAndOptions } from "../settings.js";
 
 const { useState, useEffect, PureComponent } = React;
 
@@ -32,9 +33,14 @@ export const Popup = ({
   renderFollowup,
   followupText,
   showZeroVolumeError,
+  userSettings,
+  updateUserSettings,
+  showSurvey,
+  onClickSurvey,
 }) => {
   const [inputValue, setInputValue] = useState(null);
   const [showScroll, setShowScroll] = useState(false);
+  const [userOptions, setUserOptions] = useState({});
 
   // This would lead to an infinite loop if showing the scroll effected the height, which
   // caused this to toggle showScroll back and forth infinitely. But it won't change the
@@ -55,6 +61,15 @@ export const Popup = ({
       }
     }
   });
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    const result = await getSettingsAndOptions();
+    setUserOptions(result.options);
+  };
 
   const scrollDown = () => {
     let footerHeight = 0;
@@ -113,10 +128,15 @@ export const Popup = ({
         timerTotalInMS={timerTotalInMS}
         renderFollowup={renderFollowup}
         showZeroVolumeError={showZeroVolumeError}
+        userOptions={userOptions}
+        userSettings={userSettings}
+        updateUserSettings={updateUserSettings}
       />
       <PopupFooter
         currentView={currentView}
         showSettings={showSettings}
+        showSurvey={showSurvey}
+        onClickSurvey={onClickSurvey}
         timerInMS={timerInMS}
       />
       {timerInMS > 0 ? (
@@ -130,6 +150,7 @@ export const Popup = ({
         followupText={followupText}
         renderFollowup={renderFollowup}
         currentView={currentView}
+        onSubmitFeedback={onSubmitFeedback}
       />
     </div>
   );
@@ -156,7 +177,7 @@ const PopupHeader = ({ currentView, transcript, lastIntent }) => {
         return (
           <React.Fragment>
             <p>{lastIntentTime(lastIntent)} ago you said</p>
-            <p className="utterance">{lastIntent.utterance}</p>
+            <p className="utterance">{lastIntent && lastIntent.utterance}</p>
           </React.Fragment>
         );
       case "feedbackThanks":
@@ -252,6 +273,9 @@ const PopupContent = ({
   timerTotalInMS,
   renderFollowup,
   showZeroVolumeError,
+  userOptions,
+  userSettings,
+  updateUserSettings,
 }) => {
   const getContent = () => {
     switch (currentView) {
@@ -307,6 +331,9 @@ const PopupContent = ({
             setMinPopupSize={setMinPopupSize}
             onSubmitFeedback={onSubmitFeedback}
             renderFollowup={renderFollowup}
+            userOptions={userOptions}
+            userSettings={userSettings}
+            updateUserSettings={updateUserSettings}
           />
         );
       case "startSavingPage":
@@ -359,7 +386,12 @@ const FallbackContent = ({ displayText, errorMessage, onSubmitFeedback }) => {
   );
 };
 
-const FollowupContainer = ({ followupText, renderFollowup, currentView }) => {
+const FollowupContainer = ({
+  followupText,
+  renderFollowup,
+  currentView,
+  onSubmitFeedback,
+}) => {
   if (
     currentView === "listening" ||
     currentView === "waiting" ||
@@ -377,7 +409,7 @@ const FollowupContainer = ({ followupText, renderFollowup, currentView }) => {
   }
   return (
     <div id="followup-container">
-      <IntentFeedback />
+      <IntentFeedback onSubmitFeedback={onSubmitFeedback} />
       <FollowUpWrapper
         heading={heading}
         subheading={subheading}
@@ -445,7 +477,12 @@ const FeedbackThanks = () => {
   );
 };
 
-const PopupFooter = ({ currentView, showSettings }) => {
+const PopupFooter = ({
+  currentView,
+  showSettings,
+  showSurvey,
+  onClickSurvey,
+}) => {
   if (
     currentView === "searchResults" ||
     currentView === "feedback" ||
@@ -470,16 +507,39 @@ const PopupFooter = ({ currentView, showSettings }) => {
         </svg>
       </button>
       <div id="moz-voice-privacy">
-        <a
-          href="https://firefox-voice-feedback.herokuapp.com/"
-          target="_blank"
-          rel="noopener"
-        >
-          Feedback?
-        </a>
+        {showSurvey ? (
+          <SurveyLink onClickSurvey={onClickSurvey} />
+        ) : (
+          <FeedbackLink />
+        )}
       </div>
       <div></div>
     </div>
+  );
+};
+
+const FeedbackLink = () => {
+  return (
+    <a
+      href="https://firefox-voice-feedback.herokuapp.com/"
+      target="_blank"
+      rel="noopener"
+    >
+      Feedback?
+    </a>
+  );
+};
+
+const SurveyLink = ({ onClickSurvey }) => {
+  return (
+    <a
+      href="https://qsurvey.mozilla.com/s3/voice-feedback"
+      target="_blank"
+      rel="noopener"
+      onClick={onClickSurvey}
+    >
+      Take a survey?
+    </a>
   );
 };
 
@@ -689,10 +749,15 @@ const IntentFeedback = ({ eduText, onSubmitFeedback }) => {
 
 const lastIntentTime = lastIntent => {
   let ago;
-  const minutesAgo = Math.max(
-    1,
-    Math.round((Date.now() - lastIntent.timestamp) / 60000)
-  );
+  let minutesAgo;
+  if (!lastIntent) {
+    minutesAgo = 1;
+  } else {
+    minutesAgo = Math.max(
+      1,
+      Math.round((Date.now() - lastIntent.timestamp) / 60000)
+    );
+  }
   if (minutesAgo > 60) {
     const hoursAgo = Math.round(minutesAgo / 60);
     const plural = hoursAgo === 1 ? "" : "s";
@@ -837,6 +902,9 @@ const SearchResultsContent = ({
   setMinPopupSize,
   onSubmitFeedback,
   renderFollowup,
+  userOptions,
+  userSettings,
+  updateUserSettings,
 }) => {
   if (!search) return null;
 
@@ -861,6 +929,11 @@ const SearchResultsContent = ({
   const onNextResultClick = event => {
     event.preventDefault();
     onNextSearchResultClick();
+  };
+
+  const onMusicServiceChange = name => {
+    userSettings.musicService = name;
+    updateUserSettings(userSettings);
   };
 
   const SearchCard = () => (
@@ -890,11 +963,41 @@ const SearchResultsContent = ({
     </div>
   );
 
+  const MusicSettingCard = () => {
+    return (
+      <div value={userSettings.musicService} className="results-set">
+        {userOptions.musicServices &&
+          userOptions.musicServices
+            .filter(({ name }) => name !== "auto")
+            .map(({ name, title, imgSrc }) => (
+              <button
+                key={name}
+                onClick={() => {
+                  onMusicServiceChange(name);
+                }}
+                className="music-list invisible-button"
+              >
+                <div>
+                  <img
+                    className="music-service-image"
+                    src={imgSrc}
+                    alt={name}
+                  />
+                </div>
+                <div className="results-medium-text">{title}</div>
+              </button>
+            ))}
+      </div>
+    );
+  };
+
   const renderCard = () => {
-    if (card && card.answer) {
-      return AnswerCard();
+    if (card && card.music && card.answer) {
+      return <MusicSettingCard />;
+    } else if (card && card.answer) {
+      return <AnswerCard />;
     } else if (card) {
-      return SearchCard();
+      return <SearchCard />;
     }
     return null;
   };
