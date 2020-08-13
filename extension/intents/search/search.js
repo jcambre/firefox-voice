@@ -407,7 +407,7 @@ intentRunner.registerIntent({
         searchUrl: searchInfo.searchUrl,
         index: -1,
       });
-      telemetry.add({ 
+      telemetry.add({
         hasCard: true,
         cardType: card.cardType,
       });

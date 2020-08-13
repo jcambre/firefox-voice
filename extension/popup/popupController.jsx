@@ -336,10 +336,20 @@ export const PopupController = function() {
     synth.speak(utterance);
     utterance.onend = () => {
       closePopup(2000);
+      sendMessage({
+        type: "addTelemetry",
+        properties: {
+          outputSpokenCompleted: true,
+        },
+      });
     };
+    const messageLength = text.match(/\S+/g).length;
     sendMessage({
       type: "addTelemetry",
-      properties: { outputSpoken: true },
+      properties: {
+        outputSpoken: true,
+        outputSpokenWords: messageLength,
+      },
     });
   };
 
