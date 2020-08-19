@@ -11,6 +11,26 @@ async function getAudioUrl(rssUrl) {
   return briefingUrl;
 }
 
+async function playStation(url) {
+  const tab = await browser.tabs.create({
+    url: url,
+  });
+
+  const firstEpisodeSelector = ".sc-c-playable-list-card__link";
+
+  await browserUtil.waitForPageToLoadUsingSelector(tab.id, {
+    selector: firstEpisodeSelector,
+  });
+  console.log("hokay it loaded");
+  await content.inject(tab.id, [
+    "/intents/briefings/playFirstEpisode.content.js",
+  ]);
+  const found = await browser.tabs.sendMessage(tab.id, {
+    type: "playFirstEpisode",
+    selector: firstEpisodeSelector,
+  });
+}
+
 intentRunner.registerIntent({
   name: "briefings.news",
   async run(context) {
@@ -22,24 +42,25 @@ intentRunner.registerIntent({
     //   type: "playExternalAudio",
     //   audioUrl: briefingUrl,
     // });
+    await playStation("https://www.bbc.co.uk/sounds/brand/p05hh4qy");
+  }
+});
+
+intentRunner.registerIntent({
+  name: "briefings.radioone",
+  async run(context) {
     const tab = await browser.tabs.create({
-      url: "https://www.bbc.co.uk/sounds/brand/p05hh4qy",
-    });
-
-    const firstEpisodeSelector = ".sc-c-playable-list-card__link";
-
-    await browserUtil.waitForPageToLoadUsingSelector(tab.id, {
-      selector: firstEpisodeSelector,
-    });
-    console.log("hokay it loaded");
-    await content.inject(tab.id, [
-      "/intents/briefings/playFirstEpisode.content.js",
-    ]);
-    const found = await browser.tabs.sendMessage(tab.id, {
-      type: "playFirstEpisode",
-      selector: firstEpisodeSelector,
+      url: "https://www.bbc.co.uk/sounds/play/live:bbc_radio_one",
     });
   }
+});
+
+intentRunner.registerIntent({
+  name: "briefings.localnews",
+  async run(context) {
+    const tab = await browser.tabs.create({
+      url: "https://www.bbc.co.uk/sounds/play/live:bbc_london",
+    });  }
 });
 
 intentRunner.registerIntent({

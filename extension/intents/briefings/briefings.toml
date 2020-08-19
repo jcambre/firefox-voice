@@ -33,3 +33,22 @@ match = """
 
 [[briefings.flash.example]]
 phrase = "flash briefing"
+
+[briefings.radioone]
+description = "Get the latest (full) news report from the BBC"
+match = """
+  play radio one
+  play radio 1
+"""
+
+[[briefings.radioone.example]]
+phrase = "play radio one"
+
+[briefings.localnews]
+description = "Get the latest (full) news report from the BBC"
+match = """
+  play the local news
+"""
+
+[[briefings.localnews.example]]
+phrase = "play the local news"
