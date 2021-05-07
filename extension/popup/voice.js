@@ -6,7 +6,7 @@ import * as settings from "../settings.js";
 import { sendMessage } from "../communicate.js";
 
 const STT_SERVER_URL =
-  buildSettings.sttServer || "https://speaktome-2.services.mozilla.com";
+  buildSettings.sttServer || "http://localhost:8000/asr";
 const DEEP_SPEECH_URL = buildSettings.deepSpeechServer;
 
 const locale = settings.getSettings().userLocale || navigator.language;
@@ -188,9 +188,9 @@ export class Recorder {
       this.onError(e);
       throw e;
     }
-    setTimeout(() => {
-      this.sendForDeepSpeech(blob, deferredJson);
-    });
+    // setTimeout(() => {
+    //   this.sendForDeepSpeech(blob, deferredJson);
+    // });
     if (!response.ok) {
       sendMessage({
         type: "addTelemetry",
