@@ -72,7 +72,7 @@ function handleBannerCards(bannerCardContainer) {
 
 function handleSnippetCard(card) {
   const SNIPPET_SOURCE_SELECTOR = "cite.iUh30"; // tricky: we would want to remove the child span within this
-  const SNIPPET_BODY_SELECTOR = ".e24Kjd, .iKJnec";
+  const SNIPPET_BODY_SELECTOR = ".e24Kjd, .iKJnec, .ILfuVd";
   const SNIPPET_HEADER_SELECTOR = ".kno-ecr-pt, .Z0LcW"; // need to validate! this is only one type of header i've seen
   const SNIPPET_ORDERED_LIST_SELECTOR = ".X5LH0c"; // not sure about this one
   const SNIPPET_UNORDERED_LIST_SELECTOR = ".i8Z77e"; // not sure about this one
@@ -96,7 +96,7 @@ function handleSnippetCard(card) {
     )}`;
   }
   const snippetBodyText = getInnerText(card, SNIPPET_BODY_SELECTOR);
-  return `According to ${source}, ${abbreviateTextResponse(snippetBodyText)}`;
+  return `${abbreviateTextResponse(snippetBodyText)}`;
 }
 
 // TODO: need to handle abbreviations for hours, avenue, road, N/S/E/W, and so on

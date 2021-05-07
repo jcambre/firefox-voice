@@ -1,7 +1,7 @@
 import { registerHandler } from "../../communicate.js";
 import * as cardSpeech from "./cardSpeech.js";
 
-const CARD_SELECTOR = ".vk_c, .kp-blk, .EyBRub";
+const CARD_SELECTOR = ".vk_c, .kp-blk, .ULSxyf, .ifM9O";
 const SIDEBAR_SELECTOR = "#rhs, .results--sidebar";
 const MAIN_SELECTOR = "#center_col, results--main";
 const AD_CLASS = "commercial-unit-desktop-rhs";
@@ -134,7 +134,7 @@ registerHandler("searchResultInfo", message => {
 
 registerHandler("cardContent", message => {
   const cards = findCards();
-  const card = cards.sidebarCard || cards.card;
+  const card = cards.card || cards.sidebarCard;
   if (!card) {
     throw new Error("No card found for cardContent");
   }
