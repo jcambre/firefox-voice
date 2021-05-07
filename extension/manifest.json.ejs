@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Firefox Voice Beta",
-  "version": <%= env.VERSION || package_json.version %>,
+  "version": <%= env.VERSION || version %>,
   "description": "Voice control the web",
   "developer": {
     "name": "Emerging Technologies Advanced Dev Team",
@@ -13,50 +13,38 @@
   },
   "applications": {
     "gecko": {
-      <% if (env.UPDATE_BASE) { %>
-      "update_url": "<%- env.UPDATE_BASE %>/updates.json",
-      <% } %>
       "id": "firefox-voice@mozilla.org"
     }
   },
-  "incognito": "not_allowed",
+  <% if (!env.ANDROID) { %>
+    "incognito": "not_allowed",
+  <% } %>
   "background": {
     "scripts": [
-      "util.js",
       "buildSettings.js",
       "log.js",
       <% if (! (env.NO_SENTRY && !env.FORCE_SENTRY)) { %>
       "js/vendor/sentry.js",
       <% } %>
       "catcher.js",
-      "settings.js",
       "js/vendor/fuse.js",
-      "browserUtil.js",
-      "limiter.js",
-      "background/pageMetadata.js",
-      "background/languages.js",
-      "background/main.js",
-      "background/voiceSchema.js",
-      "background/telemetry.js",
-      "background/serviceList.js",
-      "background/content.js",
-      "background/intentParser.js",
-      "background/intentRunner.js",
-      "background/intentExamples.js",
-      // Note: these intent listings are generated from extension/intents/*
-      <% for (let intentName of intentNames) { %>
-        "intents/<%- intentName %>/<%- intentName %>.js",
-      <% } %>
-      // End of intent list
-      // These service listings are generated from extension/services/*
-      <% for (let serviceName of serviceNames) { %>
-        "services/<%- serviceName %>/<%- serviceName %>.js",
-      <% } %>
-      "searching.js"
+      "background/loadMain.js",
+      "js/vendor/chrono.min.js"
     ]
   },
+  "experiment_apis": {
+    "voice": {
+      "schema": "experiments/voice/schema.json",
+      "parent": {
+        "scopes": ["addon_parent"],
+        "script": "experiments/voice/api.js",
+        "paths": [["experiments", "voice"]]
+      }
+    }
+  },
   "options_ui": {
-    "page": "options/options.html"
+    "page": "options/options.html",
+    "open_in_tab": true
   },
   "web_accessible_resources": [
     "views/CHANGELOG.html"
@@ -71,14 +59,26 @@
     "history",
     "clipboardRead",
     "clipboardWrite",
-    "bookmarks"
+    "bookmarks",
+    "downloads",
+    "browserSettings",
+    "search",
+    "tabHide",
+    "resource://pdf.js/",
+    "find"
   ],
   "browser_action": {
     "browser_style": false,
     "default_title": "Firefox Voice",
-    "default_icon": "popup/images/mic.svg",
+    "default_icon":
+      <% if (env.IN_DEVELOPMENT) { %>
+        "popup/images/mic-dev.svg",
+      <% } else { %>
+        "popup/images/mic.svg",
+      <% } %>
     "default_popup": "popup/popup.html"
   },
+  "content_security_policy": "script-src 'self'; object-src 'self';",
   "commands": {
     "_execute_browser_action": {
       "suggested_key": {

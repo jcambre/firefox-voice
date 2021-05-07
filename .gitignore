@@ -10,13 +10,22 @@ extension/views/privacy-policy.html
 extension/buildSettings.js
 extension/popup/popupController.js
 extension/popup/popupView.js
-extension/popup/*.js.map
 extension/options/optionsController.js
 extension/options/optionsView.js
-extension/options/*.js.map
+extension/options/routinesView.js
+extension/options/history/historyView.js
+extension/onboarding/onboardingController.js
+extension/onboarding/onboardingView.js
+extension/wakeword/wakewordController.js
+extension/wakeword/wakewordView.js
+extension/**/*.js.map
+extension/background/serviceImport.js
+extension/background/intentImport.js
+extension/intents/metadata.js
+extension/services/metadata.js
+extension/language/langs/*.js
 node_modules
 npm-debug.log
-package-lock.json
 web-ext-artifacts
 .DS_Store
 credentials
@@ -24,3 +33,10 @@ credentials
 manifest.json
 /addon.xpi
 /gh-pages
+Thumbs.db
+/build
+/bin/username-cache.json
+*.bundle.js
+# This is where we check out the honkling library:
+/honkling
+package-lock.json

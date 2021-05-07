@@ -1,0 +1,104 @@
+/* globals buildSettings */
+
+import * as intentRunner from "../../background/intentRunner.js";
+import * as browserUtil from "../../browserUtil.js";
+
+function findTargetWindowId(windowArray, currentWindowId, direction) {
+  const len = windowArray.length;
+  // find currentWindowId position in array
+  const currentWindowIndex = windowArray.findIndex(
+    window => window.id === currentWindowId
+  );
+  let targetIndex;
+  if (direction === "next") {
+    targetIndex = (currentWindowIndex + 1) % len;
+  } else {
+    targetIndex = (currentWindowIndex - 1 + len) % len;
+  }
+  return windowArray[targetIndex].id;
+}
+
+intentRunner.registerIntent({
+  name: "window.switch",
+  async run(context) {
+    // get current activeTab.windowId
+    const activeTab = await browserUtil.activeTab();
+    const currentWindowId = activeTab.windowId;
+    // get direction parameter
+    const direction = context.parameters.direction;
+    // getAll normal window
+    const gettingAll = await browser.windows.getAll({
+      windowTypes: ["normal"],
+    });
+    // find target windowId
+    const targetWindowId = findTargetWindowId(
+      gettingAll,
+      currentWindowId,
+      direction
+    );
+    // set target window focuse true
+    await browser.windows.update(targetWindowId, { focused: true });
+  },
+});
+
+intentRunner.registerIntent({
+  name: "window.downloads",
+  async run(context) {
+    await browser.experiments.voice.openDownloads();
+  },
+});
+
+intentRunner.registerIntent({
+  name: "window.close",
+  async run(context) {
+    context.keepPopup();
+    const currentWindow = await browser.windows.getCurrent();
+    await browser.windows.remove(currentWindow.id);
+    context.presentMessage("Window closed");
+  },
+});
+
+intentRunner.registerIntent({
+  name: "window.quitApplication",
+  async run(context) {
+    await browser.experiments.voice.quitApplication();
+  },
+});
+
+intentRunner.registerIntent({
+  name: "window.combine",
+  async run(context) {
+    const currentWindow = await browser.windows.getCurrent();
+    const tabs = await browser.tabs.query({ currentWindow: false });
+    const tabsIds = tabs.map(tabInfo => tabInfo.id);
+    await browser.tabs.move(tabsIds, { windowId: currentWindow.id, index: -1 });
+  },
+});
+
+intentRunner.registerIntent({
+  name: "window.zoom",
+  async run(context) {
+    if (buildSettings.android) {
+      const exc = new Error("Maximize not supported on Android");
+      exc.displayMessage = exc.message;
+      throw exc;
+    }
+    const currentWindow = await browser.windows.getCurrent();
+    await browser.windows.update(currentWindow.id, { state: "maximized" });
+  },
+});
+
+intentRunner.registerIntent({
+  name: "window.minimize",
+  async run(context) {
+    const currentWindow = await browser.windows.getCurrent();
+    await browser.windows.update(currentWindow.id, { state: "minimized" });
+  },
+});
+
+intentRunner.registerIntent({
+  name: "window.clearBrowserHistory",
+  async run(context) {
+    await browser.experiments.voice.clearBrowserHistory();
+  },
+});

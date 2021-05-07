@@ -1,7 +1,9 @@
 #acquiring,
 #recording,
 #paused,
-#error {
+#error,
+#fatal-error,
+#zero-volume-error {
   display: none;
 }
 
@@ -19,4 +21,16 @@
 
 .error #error {
   display: block;
+}
+
+.fatal-error #fatal-error {
+  display: block;
+}
+
+.zero-volume-error #zero-volume-error {
+  display: block;
+}
+
+img.example {
+  margin: 1em 2em;
 }

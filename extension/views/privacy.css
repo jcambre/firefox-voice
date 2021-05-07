@@ -1,0 +1,12 @@
+#list p {
+  font-weight: 600;
+}
+
+#list ul {
+  list-style: none;
+  padding: 0 0 40px;
+}
+
+#list ul li {
+  margin-bottom: -35px;
+}

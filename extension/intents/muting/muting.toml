@@ -1,0 +1,57 @@
+[muting.mute]
+description = "Mute all audible tabs (new tabs or silent tabs are not muted); does not pause any media, only mute the sound"
+match = """
+  (mute | turn off) (whatever is |) (playing | all |) (the |) (sound | everything | tab{s} |) (for me |)
+  mute
+  (be |) quiet (tabs{s} |) (for me |)
+  shut up (tab{s} |) (for me |)
+  silence
+"""
+
+[[muting.mute.example]]
+phrase = "mute (all tabs)"
+
+[[muting.mute.example]]
+phrase = "shut up tabs for me"
+test = true
+
+[[muting.mute.example]]
+phrase = "mute playing sound"
+test = true
+
+[[muting.mute.example]]
+phrase = "quiet tabs"
+test = true
+
+[muting.muteTab]
+description = "Mute just the active page"
+match = """
+  (mute | quiet | shut up) (this |) (page | tab)
+"""
+
+[[muting.muteTab.example]]
+phrase = "mute this tab"
+test = true
+
+[[muting.muteTab.example]]
+phrase = "mute page"
+test = true
+
+[muting.unmute]
+description = "Unmute all tabs"
+match = """
+  (unmute | turn on) (tab{s} | page{s}) (for me |)
+   unmute
+"""
+
+[[muting.unmute.example]]
+phrase = "unmute this page"
+test = true
+
+[[muting.unmute.example]]
+phrase = "unmute"
+test = true
+
+[[muting.unmute.example]]
+phrase = "turn on this tab"
+test = true

@@ -28,7 +28,7 @@ async function init() {
       return `
       <section>
         Phrase: <code>${quote(m.phrase)}</code><br>
-        Regex: <code>${quote(m.regex)}</code><br>
+        Compiled: <code>${quote(m.compiledPhrase)}</code><br>
         ${
           m.slots && m.slots.length
             ? "Slots: <code>" + quote(m.slots) + "</code><br>"
@@ -49,7 +49,7 @@ async function init() {
       examples = intent.examples.map(e => {
         return `
         <section>
-          Example: <code>${quote(e.text)}</code><br>
+          Example: <code>${quote(e.text.phrase)}</code><br>
           ${
             e.parsedIntent === intent.name
               ? ""
@@ -81,7 +81,7 @@ async function init() {
       description = `<p>${quote(intent.description)}</p>`;
     }
     html.push(`<div class="intent">
-      <h2 id="${intent.name}">${intent.name}</h2>
+      <h2 id="${quote(intent.name)}">${quote(intent.name)}</h2>
       ${description}
       <a href="${quote(makeViewUrl(intent.name))}">View code</a><br>
       <div>

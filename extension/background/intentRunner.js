@@ -1,240 +1,627 @@
-/* globals log, intentParser, telemetry, catcher, searching, browserUtil */
-// This gets used elsewhere as a namespace for the intent modules:
-this.intents = {};
+/* globals log, catcher */
 
-this.intentRunner = (function() {
-  const exports = {};
+import * as browserUtil from "../browserUtil.js";
+import { Database } from "../history.js";
+import { metadata } from "../intents/metadata.js";
+import { compile, splitPhraseLines } from "../language/compiler.js";
+import { PhraseSet } from "../language/findMatch.js";
+import * as settings from "../settings.js";
+import { entityTypes } from "./entityTypes.js";
+import * as intentParser from "./intentParser.js";
+import * as telemetry from "./telemetry.js";
+import { registerHandler, sendMessage } from "../communicate.js";
 
-  const FEEDBACK_INTENT_TIME_LIMIT = 1000 * 60 * 60 * 24; // 24 hours
+const FEEDBACK_INTENT_TIME_LIMIT = 1000 * 60 * 60 * 24; // 24 hours
+// Only keep this many previous intents:
+const INTENT_HISTORY_LIMIT = 20;
+const METADATA_ATTRIBUTES = new Set([
+  "description",
+  "example",
+  "examples",
+  "match",
+  "followup",
+]);
 
-  const intents = (exports.intents = {});
-  let lastIntent;
+export const intents = {};
+let lastIntent;
+// This is a copy of lastIntent that gets nullified when the pop up
+// window closes.
+let lastIntentForFollowup;
+let globalListenForFollowup = settings.getSettings().listenForFollowup;
+const intentHistory = [];
+const db = new Database("voice");
+const utteranceTable = "utterance";
+const primaryKey = "timestamp";
+const voiceVersion = 1;
+db.createTable(utteranceTable, primaryKey, voiceVersion)
+  .then(result => log.info("CREATE TABLE:", result))
+  .catch(error => log.error(error));
 
-  class IntentContext {
-    constructor(desc) {
-      this.closePopupOnFinish = true;
-      this.timestamp = Date.now();
-      Object.assign(this, desc);
-    }
+settings.watch("listenForFollowup", ns => {
+  globalListenForFollowup = ns;
+});
 
-    keepPopup() {
-      this.closePopupOnFinish = false;
-    }
+export class IntentContext {
+  constructor(params) {
+    this.closePopupOnFinish = true;
+    this.timestamp = Date.now();
+    this.expectsFollowup = false;
+    this.isFollowup = false;
+    this.isFollowupIntent = false;
+    this.insistOnFollowup = false;
+    // allows us to reuse an intent's text on retries
+    this.followupHint = {};
+    // When running follow ups, sometimes a success view is not needed,
+    // yet still flashes before the next view. This attribute allows us to
+    // force bypassing the success view.
+    this.skipSuccessView = false;
+    this.acceptFollowupIntent = [];
+    Object.assign(this, params);
+  }
 
-    done(time = undefined) {
-      this.closePopupOnFinish = false;
-      return browser.runtime.sendMessage({
+  clone() {
+    const c = new IntentContext(this);
+    c.timestamp = Date.now();
+    c.closePopupOnFinish = true;
+    return c;
+  }
+
+  keepPopup() {
+    this.closePopupOnFinish = false;
+  }
+
+  done(time = undefined) {
+    this.closePopupOnFinish = false;
+    if (!this.noPopup && !this.isFollowup && !this.isFollowupIntent) {
+      return sendMessage({
         type: "closePopup",
         time,
       });
     }
+    return null;
+  }
 
-    failed(message) {
-      telemetry.add({ intentSuccess: false });
-      telemetry.sendSoon();
-      try {
-        this.onError(message);
-      } catch (e) {
-        log.error("Error in onError handler:", e);
-      }
-      return browser.runtime.sendMessage({
-        type: "displayFailure",
+  failed(message) {
+    this.skipSuccessView = true;
+    telemetry.add({ intentSuccess: false });
+    telemetry.sendSoon();
+    try {
+      this.onError(message);
+    } catch (e) {
+      log.error("Error in onError handler:", e);
+    }
+    if (this.noPopup) {
+      return this.displayInlineMessage({ message, type: "error" });
+    }
+    return sendMessage({
+      type: "displayFailure",
+      message,
+    });
+  }
+
+  savingPage(message) {
+    if (message === "startSavingPage") {
+      return sendMessage({
+        type: "startSavingPage",
         message,
       });
     }
-
-    displayText(message) {
-      return browser.runtime.sendMessage({ type: "displayText", message });
-    }
-
-    async failedAutoplay(tab) {
-      this.keepPopup();
-      this.makeTabActive(tab);
-      await browser.runtime.sendMessage({ type: "displayAutoplayFailure" });
-    }
-
-    /** This is some ad hoc information this specific intent wants to add */
-    addExtraTelemetryData(intentExtraData) {
-      telemetry.add({ intentExtraData });
-    }
-
-    addTelemetryServiceName(intentServiceName) {
-      telemetry.add({ intentServiceName });
-    }
-
-    initTelemetry() {
-      telemetry.add({
-        inputLength: this.utterance.length,
-        intent: this.name,
-        intentCategory: this.name.split(".")[0],
-        intentFallback: this.fallback,
-        intentParseSuccess: !this.fallback,
-        intentSuccess: true,
-        utterance: this.utterance,
-        utteranceChars: this.utterance.length,
-        utteranceParsed: { slots: this.slots },
-      });
-    }
-
-    async createTab(options) {
-      return browserUtil.createTab(options);
-    }
-
-    async createTabGoogleLucky(query) {
-      const searchUrl = searching.googleSearchUrl(query, true);
-      const tab = await this.createTab({ url: searchUrl });
-      return new Promise((resolve, reject) => {
-        function onUpdated(tabId, changeInfo, tab) {
-          const url = tab.url;
-          if (url.startsWith("about:blank")) {
-            return;
-          }
-          const isGoogle = /^https:\/\/www.google.com\//.test(tab.url);
-          const isRedirect = /^https:\/\/www.google.com\/url\?/.test(url);
-          if (!isGoogle || isRedirect) {
-            if (isRedirect) {
-              // This is a URL redirect:
-              const params = new URL(url).searchParams;
-              const newUrl = params.get("q");
-              browser.tabs.update(tab.id, { url: newUrl });
-            }
-            // We no longer need to listen for updates:
-            browser.tabs.onUpdated.removeListener(onUpdated, { tabId: tab.id });
-            resolve(tab);
-          }
-        }
-        try {
-          browser.tabs.onUpdated.addListener(onUpdated, { tabId: tab.id });
-        } catch (e) {
-          throw new Error(
-            `Error in tabs.onUpdated: ${e}, onUpdated type: ${typeof onUpdated}, args: tabId: ${
-              tab.id
-            } is ${typeof tab.id}`
-          );
-        }
-      });
-    }
-
-    activeTab() {
-      return browserUtil.activeTab();
-    }
-
-    makeTabActive(tab) {
-      return browserUtil.makeTabActive(tab);
-    }
-
-    onError(message) {
-      // Can be overridden
-    }
+    return sendMessage({
+      type: "endSavingPage",
+      message,
+    });
   }
 
-  exports.registerIntent = function(intent) {
-    if (intents[intent.name]) {
-      throw new Error(`Attempt to reregister intent: ${intent.name}`);
+  async startFollowup(message = undefined) {
+    this.expectsFollowup = true;
+    if (message) {
+      this.acceptFollowupIntent = message.acceptFollowupIntent || [];
+      this.skipSuccessView = message.skipSuccessView || false;
+      this.insistOnFollowup = message.insistOnFollowup || false;
+      this.followupHint = {
+        heading: message.heading,
+        subheading: message.subheading,
+      };
     }
-    intents[intent.name] = intent;
-    if (!intent.match) {
-      throw new Error(`Intent missing .match: ${intent.name}`);
-    }
-    intentParser.registerMatcher(intent.name, intent.match);
-  };
+    return sendMessage({
+      type: "handleFollowup",
+      method: "enable",
+      message: {
+        heading: this.followupHint.heading,
+        subheading: this.followupHint.subheading,
+      },
+    });
+  }
 
-  exports.runIntent = async function(desc) {
-    catcher.setTag("intent", desc.name);
-    if (!intents[desc.name]) {
-      throw new Error(`No intent found with name ${desc.name}`);
+  async endFollowup() {
+    this.expectsFollowup = false;
+    await sendMessage({
+      type: "handleFollowup",
+      method: "disable",
+    });
+  }
+
+  parseFollowup(utterance) {
+    if (!lastIntentForFollowup || !lastIntentForFollowup.followupMatch) {
+      return null;
     }
-    const intent = intents[desc.name];
-    const context = new IntentContext(desc);
-    lastIntent = context;
-    context.initTelemetry();
-    try {
-      log.info(
-        `Running intent ${desc.name}`,
-        Object.keys(desc.slots).length
-          ? `with slots: ${JSON.stringify(desc.slots)}`
-          : "with no slots",
-        Object.keys(desc.parameters).length
-          ? `and parameters: ${JSON.stringify(desc.parameters)}`
-          : "and no params"
+    if (!this.followupPhraseSet) {
+      const phrases = [];
+      for (const line of splitPhraseLines(
+        lastIntentForFollowup.followupMatch
+      )) {
+        const compiled = compile(line, {
+          entities: entityTypes,
+          intentName: lastIntentForFollowup.name,
+        });
+        phrases.push(compiled);
+      }
+      this.followupPhraseSet = new PhraseSet(phrases);
+    }
+
+    const result = this.followupPhraseSet.match(utterance);
+    if (!result) {
+      return null;
+    }
+
+    return {
+      name: result.intentName,
+      slots: result.stringSlots(),
+      parameters: result.parameters,
+      utterance,
+      fallback: false,
+      isFollowup: true,
+      followupMatch: lastIntentForFollowup.followupMatch,
+    };
+  }
+
+  presentMessage(message) {
+    if (this.noPopup) {
+      return this.displayInlineMessage({ message, type: "normal" });
+    }
+    return sendMessage({ type: "presentMessage", message });
+  }
+
+  displayInlineMessage({ message, type }) {
+    // FIXME: actually inject something and display a message
+    window.alert(message);
+  }
+
+  async failedAutoplay(tab) {
+    this.keepPopup();
+    browserUtil.makeTabActive(tab);
+    if (this.noPopup) {
+      // FIXME: improve error message:
+      await this.displayInlineMessage({
+        message: "You must enable autoplay",
+        type: "error",
+      });
+      return;
+    }
+    await sendMessage({ type: "displayAutoplayFailure" });
+  }
+
+  /** This is some ad hoc information this specific intent wants to add */
+  addExtraTelemetryData(intentExtraData) {
+    telemetry.add({ intentExtraData });
+  }
+
+  addTelemetryServiceName(intentServiceName) {
+    telemetry.add({ intentServiceName });
+  }
+
+  initTelemetry() {
+    let name = this.name;
+    if (this.parameters.subtype !== undefined) {
+      name += "." + this.parameters.subtype;
+    }
+    telemetry.add({
+      inputLength: this.utterance.length,
+      intent: name,
+      intentCategory: this.name.split(".")[0],
+      intentFallback: this.fallback,
+      intentParseSuccess: !this.fallback,
+      intentSuccess: true,
+      utterance: this.utterance,
+      utteranceChars: this.utterance.length,
+      utteranceParsed: { slots: this.slots },
+    });
+  }
+
+  onError(message) {
+    // Can be overridden
+  }
+}
+
+export function registerIntent(intent) {
+  if (intents[intent.name]) {
+    throw new Error(`Attempt to reregister intent: ${intent.name}`);
+  }
+  const parts = intent.name.split(".");
+  if (parts.length !== 2) {
+    throw new Error(`Intent ${intent.name} should be named like X.Y`);
+  }
+  if (!metadata[parts[0]] || !metadata[parts[0]][parts[1]]) {
+    throw new Error(`No ${parts[0]}.toml metadata for ${intent.name}`);
+  }
+  const data = metadata[parts[0]][parts[1]];
+  // Pluralize the examples:
+  if (data.example) {
+    data.examples = data.example;
+    delete data.example;
+  }
+  for (const attr in data) {
+    if (attr in intent) {
+      throw new Error(
+        `Metadata for ${intent.name} contains attribute ${attr} that is also in intent object`
       );
-      await intent.run(context);
-      if (context.closePopupOnFinish) {
-        context.done();
-      }
-      // FIXME: this isn't necessarily the right time to send the ping, if the intent
-      // isn't actually complete:
-      telemetry.sendSoon();
-    } catch (e) {
-      const display = e.displayMessage || `Internal error: ${e}`;
-      context.failed(display);
-      if (e.displayMessage) {
-        log.info(
-          "Expected error in intent",
-          desc.name,
-          ":",
-          String(e),
-          e.stack
-        );
-      } else {
-        log.error("Error in intent", desc.name, ":", String(e), e.stack);
-        catcher.capture(e);
+    }
+    if (!METADATA_ATTRIBUTES.has(attr)) {
+      throw new Error(
+        `Metadata for ${intent.name} contains illegal attribute ${attr}`
+      );
+    }
+  }
+  if (data.followup) {
+    data.followupMatch = data.followup.match;
+    delete data.followup;
+  }
+  Object.assign(intent, data);
+  intents[intent.name] = intent;
+  if (!intent.match) {
+    throw new Error(`Intent missing .match: ${intent.name}`);
+  }
+  intentParser.registerMatcher(intent.name, intent.match);
+}
+
+export function setLastIntent(intent) {
+  lastIntent = intent;
+  lastIntentForFollowup = intent;
+}
+
+export async function runUtterance(utterance, noPopup) {
+  log.timing(`intentRunner.runUtterance(${utterance}) called`);
+  for (const name in registeredRoutines) {
+    const re = new RegExp(`\\b${name}\\b`, "i");
+    if (re.test(utterance)) {
+      const repl = utterance.replace(re, "routine");
+      const context = registeredRoutines[name].clone();
+      const handler = intents[context.name];
+      const method =
+        handler.runRoutine ||
+        async function(repl, context, utterance) {
+          if (repl === "routine") {
+            await runIntent(context);
+            return true;
+          }
+          return false;
+        };
+      const result = await method.call(handler, repl, context, utterance);
+      if (result) {
+        // It was handled
+        return null;
       }
     }
-  };
+  }
+  log.timing("intentRunner finished routine checking");
+  let contextParams = intentParser.parse(utterance);
+  log.timing("intentParser returned");
+  contextParams.noPopup = !!noPopup;
+  contextParams.followupMatch = intents[contextParams.name].followupMatch;
+  if (lastIntentForFollowup && lastIntentForFollowup.expectsFollowup) {
+    const followup = lastIntentForFollowup.parseFollowup(utterance);
+    if (followup) {
+      contextParams = followup;
+    } else if (
+      lastIntentForFollowup.acceptFollowupIntent &&
+      lastIntentForFollowup.acceptFollowupIntent.includes(contextParams.name)
+    ) {
+      contextParams.isFollowupIntent = true;
+    } else if (
+      !globalListenForFollowup ||
+      (globalListenForFollowup && lastIntentForFollowup.insistOnFollowup)
+    ) {
+      lastIntentForFollowup.failed(
+        `The phrase\n\n"${contextParams.utterance}"\n\nis invalid. Please try again`
+      );
+      return lastIntentForFollowup.startFollowup();
+    } else {
+      // This is a new intent when listening for all follow ups, so we
+      // clear previous follow up hints
+      lastIntentForFollowup.endFollowup();
+    }
+  }
+  log.timing("Running intent...");
+  const result = await runIntent(contextParams);
+  log.timing("Finished running intent");
+  return result;
+}
 
-  exports.getIntentSummary = function() {
-    const names = intentParser.getIntentNames();
-    return names.map(name => {
-      const intent = Object.assign({}, intents[name]);
-      delete intent.run;
-      const matchSet =
-        typeof intent.match === "string"
-          ? new intentParser.MatchSet(intent.match)
-          : intent.match;
-      const matchers = matchSet.getMatchers();
-      delete intent.match;
-      intent.matchers = matchers.map(m => {
+registerHandler("runIntent", (message, sender) => {
+  if (message.closeThisTab) {
+    closeTabSoon(sender.tab.id, sender.tab.url);
+  }
+  return runUtterance(message.text, message.noPopup);
+});
+
+function closeTabSoon(tabId, tabUrl) {
+  setTimeout(async () => {
+    try {
+      const tab = await browser.tabs.get(tabId);
+      if (tab.url !== tabUrl) {
+        // The tab has been updated, and shouldn't be closed
+        return;
+      }
+      await browser.tabs.remove(tabId);
+    } catch (e) {
+      log.error("Error closing temporary execution tab:", e);
+      catcher.capture(e);
+    }
+  }, 250);
+}
+
+export async function runIntent(contextParams) {
+  catcher.setTag("intent", contextParams.name);
+  if (!intents[contextParams.name]) {
+    throw new Error(`No intent found with name ${contextParams.name}`);
+  }
+  const intent = intents[contextParams.name];
+  const context = new IntentContext(contextParams);
+  lastIntent = context;
+  lastIntentForFollowup = lastIntent;
+  addIntentHistory(context);
+  context.initTelemetry();
+
+  try {
+    log.info(
+      `Running intent ${contextParams.name}`,
+      Object.keys(contextParams.slots).length
+        ? `with slots: ${JSON.stringify(contextParams.slots)}`
+        : "with no slots",
+      Object.keys(contextParams.parameters).length
+        ? `and parameters: ${JSON.stringify(contextParams.parameters)}`
+        : "and no params"
+    );
+    if (lastIntent.isFollowup) {
+      await intent.runFollowup(context);
+    } else {
+      await intent.run(context);
+    }
+    if (context.closePopupOnFinish) {
+      context.done();
+    }
+    // FIXME: this isn't necessarily the right time to send the ping, if the intent
+    // isn't actually complete:
+    telemetry.sendSoon();
+  } catch (e) {
+    const display = e.displayMessage || `Internal error: ${e}`;
+    context.failed(display);
+    if (e.displayMessage) {
+      log.info(
+        "Expected error in intent",
+        contextParams.name,
+        ":",
+        String(e),
+        e.stack
+      );
+    } else {
+      log.error("Error in intent", contextParams.name, ":", String(e), e.stack);
+      catcher.capture(e);
+    }
+  }
+}
+
+export function getIntentSummary() {
+  const names = intentParser.getIntentNames();
+  return names.map(name => {
+    const intent = Object.assign({}, intents[name]);
+    delete intent.run;
+    const matchSet = new PhraseSet(
+      splitPhraseLines(intent.match).map(line =>
+        compile(line, { entities: entityTypes, intentName: name })
+      )
+    );
+    const matchers = matchSet.matchPhrases;
+    intent.matchSource = intent.match;
+    intent.matchers = matchers.map(m => {
+      return {
+        phrase: m.originalSource,
+        compiledPhrase: m.toString(),
+        slots: [...m.slotNames().values()],
+        parameters: m.parameters,
+      };
+    });
+    delete intent.match;
+    if (intent.examples) {
+      intent.examples = intent.examples.map(e => {
+        const toMatch = e.phrase;
+        const parsed = intentParser.parse(
+          toMatch,
+          // Allow fallback for search.search, but not otherwise:
+          name !== "search.search"
+        ) || {
+          name: "NO MATCH",
+          slots: {},
+        };
         return {
-          phrase: m.phrase,
-          slots: m.slots,
-          regex: String(m.regex),
-          parameters: m.parameters,
+          parsedIntent: parsed.name,
+          text: e,
+          slots: parsed.slots,
+          parameters: parsed.parameters,
         };
       });
-      if (intent.examples) {
-        intent.examples = intent.examples.map(e => {
-          const toMatch = e.replace(/^test:/, "").replace(/[()]/g, "");
-          const parsed = intentParser.parse(toMatch, true) || {
-            name: "NO MATCH",
-            slots: {},
-          };
-          return {
-            parsedIntent: parsed.name,
-            text: e,
-            slots: parsed.slots,
-            parameters: parsed.parameters,
-          };
-        });
-      }
-      return intent;
-    });
-  };
-
-  exports.getLastIntentForFeedback = function() {
-    if (!lastIntent) {
-      return null;
     }
-    if (Date.now() - lastIntent.timestamp > FEEDBACK_INTENT_TIME_LIMIT) {
-      lastIntent = null;
-      return null;
-    }
-    return lastIntent;
-  };
+    return intent;
+  });
+}
 
-  exports.clearFeedbackIntent = function() {
+registerHandler("getIntentSummary", getIntentSummary);
+
+function addIntentHistory(context) {
+  intentHistory.push(context);
+  intentHistory.splice(0, intentHistory.length - INTENT_HISTORY_LIMIT);
+  const userSettings = settings.getSettings();
+  if (!userSettings.saveHistory) {
+    return;
+  }
+  if (userSettings.saveAudioHistory) {
+    sendMessage({ type: "getLastAudio", utterance: context.utterance })
+      .then(audio => {
+        const audioContext = Object.assign({}, context, { audio });
+        db.add(utteranceTable, audioContext).catch(error => log.error(error));
+      })
+      .catch(e => {
+        log.error("Error getting audio for last utterance:", e);
+        db.add(utteranceTable, context).catch(error => log.error(error));
+      });
+  } else {
+    db.add(utteranceTable, context).catch(error => log.error(error));
+  }
+}
+
+export function getIntentHistory() {
+  return intentHistory;
+}
+
+const registeredRoutines = {};
+
+export function registerRoutine(name, context) {
+  name = name.toLowerCase();
+  if (!context) {
+    delete registeredRoutines[name];
+    log.info("Removed routine", name);
+  } else {
+    registeredRoutines[name] = context;
+    log.info("Added routine", name, "->", context.name, context.slots);
+  }
+  localStorage.setItem(
+    "registeredRoutines",
+    JSON.stringify(registeredRoutines)
+  );
+}
+
+registerHandler("registerRoutine", message => {
+  let context = message.context;
+  if (context !== null) {
+    context = new IntentContext(context);
+  }
+  return registerRoutine(message.name, context);
+});
+
+async function moveNicknameToRoutine() {
+  const result = await browser.storage.sync.get(["registeredNicknames"]);
+  if (result.registeredNicknames) {
+    for (const name in result.registeredNicknames) {
+      const value = result.registeredNicknames[name];
+      value.routine = value.nickname;
+      delete value.nickname;
+    }
+    const registeredRoutines = result.registeredNicknames;
+    localStorage.setItem(
+      "registeredRoutines",
+      JSON.stringify(registeredRoutines)
+    );
+    const checkRoutines = localStorage.getItem("registeredRoutines");
+    if (JSON.stringify(checkRoutines) === JSON.stringify(registeredRoutines)) {
+      await browser.storage.sync.remove("registeredNicknames");
+    }
+  }
+}
+
+// switch to local storage;
+async function initRegisteredRoutines() {
+  await moveNicknameToRoutine();
+  const routines = JSON.parse(localStorage.getItem("registeredRoutines"));
+  if (routines) {
+    for (const name in routines) {
+      const value = routines[name];
+      const context = new IntentContext(value);
+      registeredRoutines[name] = context;
+      log.info("Loaded routine", name, context.name, context.slots);
+    }
+  }
+}
+
+export function getRegisteredRoutines() {
+  return registeredRoutines;
+}
+
+registerHandler("getRegisteredRoutines", getRegisteredRoutines);
+
+let pageNames = {};
+
+export async function registerPageName(name, { url }) {
+  name = name.toLowerCase();
+  const creationDate = Date.now();
+  const result = await browser.storage.sync.get("pageNames");
+  pageNames = result.pageNames || {};
+
+  pageNames[name] = url;
+
+  log.info("Added routine for page", name, "->", url, creationDate);
+  await browser.storage.sync.set({ pageNames });
+}
+
+export async function getRegisteredPageName(name) {
+  const result = await browser.storage.sync.get("pageNames");
+  pageNames = result.pageNames;
+
+  if (!pageNames[name] || !name) {
+    const exc = new Error("No page name to remove");
+    exc.displayMessage = `The page name "${name}" not found`;
+    throw exc;
+  }
+  return pageNames;
+}
+
+export async function unregisterPageName(name) {
+  delete pageNames[name];
+  log.info("Removed routine for page", name);
+  await browser.storage.sync.set({ pageNames });
+}
+
+async function initRegisteredPageName() {
+  const result = await browser.storage.sync.get(["pageNames"]);
+  if (result.pageNames) {
+    for (const name in result.pageNames) {
+      const value = result.pageNames[name];
+      log.info("Loaded page name", name, value);
+    }
+  }
+}
+
+export function getLastIntentForFeedback() {
+  if (!lastIntent) {
+    return null;
+  }
+  if (Date.now() - lastIntent.timestamp > FEEDBACK_INTENT_TIME_LIMIT) {
     lastIntent = null;
-  };
+    return null;
+  }
+  return lastIntent;
+}
 
-  return exports;
-})();
+registerHandler("getLastIntentForFeedback", () => {
+  return getLastIntentForFeedback();
+});
+
+export function clearFeedbackIntent() {
+  lastIntent = null;
+}
+
+export function clearFollowup() {
+  if (lastIntentForFollowup) {
+    lastIntentForFollowup = null;
+  }
+}
+
+registerHandler("clearFollowup", clearFollowup);
+
+registerHandler("parseUtterance", message => {
+  return new IntentContext(
+    intentParser.parse(message.utterance, message.disableFallback)
+  );
+});
+
+initRegisteredRoutines();
+initRegisteredPageName();

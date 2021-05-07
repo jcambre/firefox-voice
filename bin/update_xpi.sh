@@ -6,7 +6,7 @@ set -e
 
 source ./xpi-config.sh
 
-mkdir -p tmp-xpi/dev tmp-xpi/stage tmp-xpi/prod
+mkdir -p tmp-xpi/dev tmp-xpi/dev-android tmp-xpi/stage tmp-xpi/prod
 
 echo "Fetching $CIRCLECI_URL"
 curl -s $CIRCLECI_URL | python3 -c '
@@ -47,7 +47,7 @@ update_public_log() {
 
 version=unknown
 
-for channel in dev stage prod ; do
+for channel in dev dev-android stage prod ; do
     new_xpi="tmp-xpi/$channel/firefox-voice.xpi"
     signed_xpi="${new_xpi}.signed"
     old_xpi="${new_xpi}.old"

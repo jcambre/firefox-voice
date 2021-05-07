@@ -1,0 +1,200 @@
+[navigation.serviceSearch]
+description = "Search a specific service, using their site-specific search page"
+match = """
+  google images (of | for |) [query] [service=images]
+  images (of | for) [query] [service=images]
+  open [service:serviceName] and search [query]
+  (do a |) (search | search on | query on | lookup on | look up on | look on | look in | look up in | lookup in) (my |) [service:serviceName] (for | for the |) [query] (for me |)
+  (do a |) (search | query ) my [service:serviceName] (for | for the |) [query] (for me|)
+  (do a |) (search | query ) (the site | this site | here) (for | for the |) [query] (for me|)
+  (do a |) (search | query | find | find me | look up | lookup | look on | look for) (my | on | for | in |) (the |) [query] (on | in) [service:serviceName] (for me |)
+"""
+
+[[navigation.serviceSearch.example]]
+phrase = "Search my Gmail for tickets to Hamilton"
+
+[[navigation.serviceSearch.example]]
+phrase = "Look up The Book Thief on GoodReads"
+
+[[navigation.serviceSearch.example]]
+phrase = "Search CSS grid on MDN"
+
+[[navigation.serviceSearch.example]]
+phrase = "Look up The Book Thief on GoodReads"
+
+[[navigation.serviceSearch.example]]
+phrase = "Search CSS grid on MDN"
+
+[[navigation.serviceSearch.example]]
+phrase = "Look up Hamilton in Gmail"
+
+[[navigation.serviceSearch.example]]
+phrase = "Images of sparrows"
+
+[[navigation.serviceSearch.example]]
+phrase = "Find the nearest sushi on maps"
+
+[[navigation.serviceSearch.example]]
+phrase = "search google images of sparrows for me"
+test = true
+expectSlots = {service = "google images"}
+
+[[navigation.serviceSearch.example]]
+phrase = "Find website work plan on my Google Drive"
+test = true
+
+[[navigation.serviceSearch.example]]
+phrase = "Search ScrollAnywhere on add-ons"
+
+[navigation.clearQueryDatabase]
+description = "Debugging command to clear the cache of 'open' queries"
+match = """
+  clear query (database | cache)
+"""
+
+[navigation.goBack]
+description = "Go back to the previous page, if one is available"
+match = """
+  (go |) back
+"""
+
+[navigation.goForward]
+description = "Go forward to the next page, if one is available"
+match = """
+  go forward
+"""
+
+[navigation.navigate]
+description = "Navigate to the named page or if does not exist, directly to a site, using Google's I'm Feeling Luck and the query"
+match = """
+  (bring me | take me | go | navigate | show me | open) (to | find |) (page |) [query]
+  (bring me | take me | go | navigate | show me | open) (to | find |) (page |) (in |) (a |) (new |) [where] (and go | and |) (to | find | open) [query]
+"""
+
+[[navigation.navigate.example]]
+phrase = "Go to the New York Times"
+
+[[navigation.navigate.example]]
+phrase = "Show me the 49ers schedule"
+
+[[navigation.navigate.example]]
+phrase = "Go to the Health section of the BBC"
+
+[[navigation.navigate.example]]
+phrase = "open a new tab to the New York Times"
+test = true
+expectSlots = {where = "tab"}
+
+[[navigation.navigate.example]]
+phrase = "open a new window to Washington Post"
+test = true
+expectSlots = {where = "window"}
+
+[[navigation.navigate.example]]
+phrase = "Go to a new window and find the New York Times"
+test = true
+expectSlots = {where = "window"}
+
+[[navigation.navigate.example]]
+phrase = "Open a new window and go to Wikipedia"
+test = true
+expectSlots = {where = "window"}
+
+[navigation.translate]
+description = "Translate the given page to the chosen language, using Google Translate"
+match = """
+  translate (this |) (web page | webpage | page | tab | article | site |) (to english |) (for me |)
+  translate (this |) (web page | webpage | page | tab | article | site |) to [language:lang] (for me |)
+"""
+
+[[navigation.translate.example]]
+phrase = "translate this page to Spanish"
+test = true
+expectSlots = {language = "Spanish"}
+
+[[navigation.translate.example]]
+phrase = "translate this page to Dutch"
+test = true
+
+[navigation.translateSelection]
+description = "Translate whatever text is selected to English, using Google Translate"
+match = """
+  translate (this | the |) (selection | selected text) (to english |) (for me |)
+  translate (this | the |) (selection | selected text) to [language:lang] (for me |)
+"""
+
+[[navigation.translateSelection.example]]
+phrase = "Translate selection"
+
+[[navigation.translateSelection.example]]
+phrase = "translate this selection to Hungarian"
+test = true
+expectSlots = {language = "Hungarian"}
+
+[[navigation.translateSelection.example]]
+phrase = "translate the selected text to Slovak"
+test = true
+
+[[navigation.translateSelection.example]]
+phrase = "translate this selection to French"
+expectSlots = {language = "French"}
+
+[navigation.followLink]
+description = "Follow the named link"
+match = """
+  (follow | click | click on | openlink | clicklink) (link |) [query]
+  (open | go to) link [query]
+"""
+
+[[navigation.followLink.example]]
+phrase = "follow link latest news"
+
+
+[navigation.signInAndOut]
+description = "Follow the named sign in or out link and click"
+match = """
+  (sign in | login | log in)
+  (sign out | logout | log out)
+"""
+
+[[navigation.signInAndOut.example]]
+phrase = "sign in"
+
+[[navigation.signInAndOut.example]]
+phrase = "login"
+test = true
+
+[[navigation.signInAndOut.example]]
+phrase = "log in"
+test = true
+
+[[navigation.signInAndOut.example]]
+phrase = "sign out"
+
+[[navigation.signInAndOut.example]]
+phrase = "logout"
+test = true
+
+[[navigation.signInAndOut.example]]
+phrase = "log out"
+test = true
+
+[navigation.closeDialog]
+description = "Closes a lightbox-style dialog box"
+match = """
+  (close | dismiss | cancel | stop) (dialog | lightbox | question)
+"""
+
+[[navigation.closeDialog.example]]
+phrase = "Close dialog"
+
+[navigation.internetArchive]
+description = "Search current url on archive.org"
+match = """
+  (open | search) (for |) (this |) (page |) (on | in |) (the |) (internet archive{s} | archive.org | wayback | wayback machine)
+  Wayback (machine |) (this |) (page | tab)
+  What (did | does |) (this |) (page | tab | site | website) used (to |) (be | look) like
+"""
+
+[[navigation.internetArchive.example]]
+phrase = "open this page in the internet archive"

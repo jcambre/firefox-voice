@@ -1,0 +1,510 @@
+[tabs.close]
+description = "Closes the current tab"
+match = """
+  close (the | this |) (active | current |) (tab{s} | site | page) (for me |)
+  close (the | this | that)
+"""
+
+[[tabs.close.example]]
+phrase = "close tab"
+
+[[tabs.close.example]]
+phrase = "close tabs"
+test = true
+
+[[tabs.close.example]]
+phrase = "close active tab"
+test = true
+
+[[tabs.close.example]]
+phrase = "close the active tabs"
+test = true
+
+[[tabs.close.example]]
+phrase = "close the current top"
+test = true
+
+[tabs.undoCloseTab]
+description = "Undo close tab"
+match = """
+  (undo | reopen | restore | reinstate | bring | recover) (back |) (the | my | that |) (last | recently |) (close | closed |) (tab |)
+"""
+
+[[tabs.undoCloseTab.example]]
+phrase = "Undo close tab"
+
+[[tabs.undoCloseTab.example]]
+phrase = "Undo last closed tab"
+test = true
+
+[[tabs.undoCloseTab.example]]
+phrase = "Reopen the last closed tab"
+test = true
+
+[[tabs.undoCloseTab.example]]
+phrase = "Reopen that tab"
+test = true
+
+[[tabs.undoCloseTab.example]]
+phrase = "Reopen closed tab"
+test = true
+
+[[tabs.undoCloseTab.example]]
+phrase = "Restore last tab"
+test = true
+
+[[tabs.undoCloseTab.example]]
+phrase = "Reinstate last tab"
+test = true
+
+[[tabs.undoCloseTab.example]]
+phrase = "Bring back last tab"
+test = true
+
+[tabs.undoCloseWindow]
+description = "Undo close window"
+match = """
+  undo close window
+  undo window close
+"""
+
+[[tabs.undoCloseWindow.example]]
+phrase = "Undo close window"
+test = true
+
+[tabs.duplicate]
+description = "Duplicates a tab"
+match = """
+  duplicate (this | current |) (tab | page |) (for me |)
+"""
+
+[[tabs.duplicate.example]]
+phrase = "Duplicate this page"
+
+[tabs.fullScreen]
+description = "Full screen mode"
+match = """
+  (make |) (full screen | fullscreen)
+"""
+
+[[tabs.fullScreen.example]]
+phrase = "full screen"
+
+[tabs.moveToWindow]
+description = "Move tab in a new window"
+match = """
+  (open | move) (tab | this) (in | to) (a |) new window (for me|)
+"""
+
+[[tabs.moveToWindow.example]]
+phrase = "Move tab in a new window"
+
+[tabs.open]
+description = "Opens a new (blank) tab"
+match = """
+  open tab
+  (open | launch | create) (a | the |) (new | blank |) tab (for me|)
+  new (blank |) tab
+"""
+
+[[tabs.open.example]]
+phrase = "open tab"
+
+[[tabs.open.example]]
+phrase = "open top for me"
+test = true
+
+[[tabs.open.example]]
+phrase = "create tab"
+test = true
+
+[[tabs.open.example]]
+phrase = "open the tab"
+test = true
+
+[[tabs.open.example]]
+phrase = "open a blank tap for me"
+test = true
+
+[tabs.openHomePage]
+description = "Opens HomePage in a tab"
+match = """
+  (open | go to |) (my |) homepage (for me|)
+"""
+
+[[tabs.openHomePage.example]]
+phrase = "open my homepage"
+
+[tabs.openPrivateWindow]
+description = "Opens a new private window"
+match = """
+  open (a |) (new | blank |) (private | incognito) window (for me|)
+  (new | activate) (private | incognito) (window | mode)
+"""
+
+[[tabs.openPrivateWindow.example]]
+phrase = "open private window"
+
+[tabs.openWindow]
+description = "Opens a new (blank) window"
+match = """
+  open window
+  (open | launch) (a |) (new | blank |) window (for me|)
+  new (blank |) window
+"""
+
+[[tabs.openWindow.example]]
+phrase = "open window"
+
+[tabs.pin]
+description = "Pins the current tab"
+match = """
+  pin (this |) tab (for me |)
+"""
+
+[[tabs.pin.example]]
+phrase = "pin tab"
+
+[[tabs.pin.example]]
+phrase = "pin tap"
+test = true
+
+[tabs.reload]
+description = "Reload the active tab of the current window"
+match = """
+  (reload | refresh) (this | current |) (tab | page |) (for me |)
+"""
+
+[[tabs.reload.example]]
+phrase = "reload this page"
+
+[tabs.saveAsPdf]
+description = "Saves the current tab as a PDF file"
+match = """
+  save (this | current |) (tab |) (as |) pdf (for me |)
+"""
+
+[[tabs.saveAsPdf.example]]
+phrase = "Save as PDF"
+
+[tabs.unpin]
+description = "Unpins the current tab"
+match = """
+  unpin (this |) tab (for me |)
+"""
+
+[[tabs.unpin.example]]
+phrase = "unpin tab"
+
+[tabs.zoomIn]
+description = "Zoom in current tab"
+match = """
+  zoom (in |) (this |) (tab |) (for me |)
+  increase size (for me |)
+"""
+
+[[tabs.zoomIn.example]]
+phrase = "Zoom in tab"
+
+[tabs.zoomOut]
+description = "Zoom out current tab"
+match = """
+  zoom out (this |) (tab |) (for me |)
+  decrease size (for me |)
+"""
+
+[[tabs.zoomOut.example]]
+phrase = "Zoom out tab"
+
+[tabs.zoomReset]
+description = "Reset zoom in current tab"
+match = """
+  reset (zoom | size) (for me |)
+  (zoom | size) reset (for me |)
+"""
+
+[[tabs.zoomReset.example]]
+phrase = "Reset zoom"
+
+[tabs.previous]
+description = "Go to a previously active tab"
+match = """
+  (Go | switch | change | activate |) (the | my |) previous tab
+"""
+
+[[tabs.previous.example]]
+phrase = "Previous tab"
+
+[tabs.switchDir]
+description = "Go in some direction of tabs"
+match = """
+  (Go | switch | change | activate |) (to |) (the |) (next | right) tab                [dir=next]
+  (Go | switch | change | activate |) (to |) (the |) tab (to |) (the |) (next | right) [dir=next]
+  (Go | switch | change | activate |) (to |) (the |) left tab                          [dir=prev]
+  (Go | switch | change | activate |) (to |) (the |) tab (to |) (the |) left           [dir=prev]
+"""
+
+[[tabs.switchDir.example]]
+phrase = "Next tab"
+expectParameters = {dir = "next"}
+
+[[tabs.switchDir.example]]
+phrase = "Tab left"
+expectParameters = {dir = "prev"}
+test = true
+
+[[tabs.switchDir.example]]
+phrase = "Switch to the tab to the left"
+expectParameters = {dir = "prev"}
+
+[tabs.switchSide]
+description = "Go to the first/last tab"
+match = """
+  (Go | switch | change | activate |) (to |) (the |) first tab [dir=first]
+  (Go | switch | change | activate |) (to |) (the |) last tab  [dir=last]
+"""
+
+[[tabs.switchSide.example]]
+phrase = "Go to the first tab"
+expectParameters = {dir = "first"}
+
+[[tabs.switchSide.example]]
+phrase = "Go to the last tab"
+expectParameters = {dir = "last"}
+
+[[tabs.switchDir.example]]
+phrase = "Go to the right tab"
+expectParameters = {dir = "next"}
+
+
+
+[tabs.switchDirPinned]
+description = "Go in some direction of the pinned tabs"
+match = """
+  (Go | switch | change | activate |) (to |) (the |) (next | right) (pinned | app) tab                   [dir=next]
+  (Go | switch | change | activate |) (to |) (the |) (pinned | app) tab (to |) (the |) (next | right)    [dir=next]
+  (Go | switch | change | activate |) (to |) (the |) (previous | left) (pinned | app) tab                [dir=prev]
+  (Go | switch | change | activate |) (to |) (the |) (pinned | app) tab (to |) (the |) (previous | left) [dir=prev]
+"""
+
+[[tabs.switchDirPinned.example]]
+phrase = "Previous pinned tab"
+
+[tabs.switchSidePinned]
+description = "Go to the first pinnned tab"
+match = """
+  (Go | switch | change | activate |) (to |) (the |) first (pinned | app) tab [dir=first]
+  (Go | switch | change | activate |) (to |) (the |) last (pinned | app) tab  [dir=last]
+"""
+
+[tabs.moveSelectedToNewWindow]
+description = "Move selected tabs to new window"
+match = """
+  (move | launch | start) selected tabs (to | in |) (a |) (new |) window
+  (launch | start |) new window (with |) selected tab{s}
+"""
+
+[[tabs.moveSelectedToNewWindow.example]]
+phrase = "Move selected tabs to new window"
+
+[tabs.collectAllTabs]
+description = "Collect all tabs by url"
+match = """
+  (collect | gather) (all | the|) tabs (in | from) all (the|) window{s} [allWindows=true]
+  (collect | gather) (all | the|) tabs [allWindows=false]
+"""
+
+[[tabs.collectAllTabs.example]]
+phrase = "Collect all tabs"
+
+[[tabs.collectAllTabs.example]]
+phrase = "Gather all tabs"
+test = true
+
+[tabs.collectMentionedTabs]
+description = "Collect tabs similar to active tab or by query"
+match = """
+  (collect | gather) these tabs [allWindows=false]
+  (collect | gather) these tabs (in | from) all (the|) window{s} [allWindows=true]
+  (collect | gather) tabs (like | from |) (this |) (site | page | url | domain | host |) [allWindows=false]
+  (collect | gather) tabs (like | from |) (this |) (site | page | url | domain | host |) (in | from) all (the|) window{s} [allWindows=true]
+
+  (collect | gather) (all|) [query] tabs [allWindows=false]
+  (collect | gather) (all|) [query] tabs (in | from) all (the|) window{s} [allWindows=true]
+
+"""
+
+[[tabs.collectMentionedTabs.example]]
+phrase = "Collect these tabs"
+
+[[tabs.collectMentionedTabs.example]]
+phrase = "Collect all Google Docs tabs"
+
+[[tabs.collectMentionedTabs.example]]
+phrase = "Gather all Google Docs tabs"
+test = true
+
+[tabs.closeSelectedTabs]
+description = "Close selected tabs"
+match = """
+  (close | remove) (all |) (the |) selected (tabs | pages |)
+"""
+
+[[tabs.closeSelectedTabs.example]]
+phrase = "Close all selected tabs"
+
+[[tabs.closeSelectedTabs.example]]
+phrase = "Remove the selected tabs"
+test = true
+
+[tabs.refreshSelectedTabs]
+description = "Refresh selected tabs"
+match = """
+  (refresh | reload) (all |) (the |) selected (tabs | pages |)
+"""
+
+[[tabs.refreshSelectedTabs.example]]
+phrase = "Refresh all selected tabs"
+
+[[tabs.refreshSelectedTabs.example]]
+phrase = "Reload the selected tabs"
+test = true
+
+[tabs.countTabs]
+description = "Count tabs"
+match = """
+ count (my| my open| open | how many |) tabs (I have open|)
+ how many (of my|) tabs (are | do I have |) open
+"""
+
+[[tabs.countTabs.example]]
+phrase = "Count tabs"
+
+[[tabs.countTabs.example]]
+phrase = "Count my tabs"
+test = true
+
+[[tabs.countTabs.example]]
+phrase = "Count open tabs"
+test = true
+
+[[tabs.countTabs.example]]
+phrase = "Count my open tabs"
+test = true
+
+[[tabs.countTabs.example]]
+phrase = "Count my open tabs"
+
+[[tabs.countTabs.example]]
+phrase = "Count how many tabs I have open"
+
+[[tabs.countTabs.example]]
+phrase = "How many tabs do I have open"
+test = true
+
+[[tabs.countTabs.example]]
+phrase = "How many tabs are open"
+
+[tabs.findOnPage]
+description = "Find on page content"
+match = """
+  find [query] on (this |) (page | tab)
+  search (this |) (page | tab) for [query]
+"""
+
+[[tabs.findOnPage.example]]
+phrase = "Find query on this page"
+test = true
+
+[[tabs.findOnPage.example]]
+phrase = "Find spaghetti on page"
+
+[tabs.findOnPageNext]
+description = "Find next match"
+match = """
+(find | search |) (the |) next match
+"""
+
+[[tabs.findOnPageNext.example]]
+phrase = "next match"
+test = true
+
+[tabs.findOnPagePrevious]
+description = "Find previous match"
+match = """
+(find | search |) (the |) previous match
+"""
+
+[[tabs.findOnPagePrevious.example]]
+phrase = "previous match"
+test = true
+
+[tabs.selectAllTabs]
+description = "Select all tabs"
+match = """
+    (select | highlight) (all |) (the | this | ) (tab{s} | taps | page )
+"""
+
+[[tabs.selectAllTabs.example]]
+phrase = "Select all the tabs"
+test = true
+
+[[tabs.selectAllTabs.example]]
+phrase = "Select all tabs"
+
+[tabs.selectTabsInDirection]
+description = "Select tabs to the left/right"
+match = """
+    (select | highlight) (all |) (tab{s} | page{s}) (to | in | by |) (the |) right [dir=right] [allWindows=false]
+    (select | highlight) (all |) (tab{s} | page{s}) (to | in | by |) (the |) left  [dir=left] [allWindows=false]
+"""
+
+[[tabs.selectTabsInDirection.example]]
+phrase = "Select all tabs to the right"
+expectParameters = {dir = "right"}
+
+[[tabs.selectTabsInDirection.example]]
+phrase = "Select all tabs to the left"
+expectParameters = {dir = "left"}
+
+[tabs.selectNumbersTabs]
+description = "Select first/last numbers of tabs"
+match = """
+    (select | highlight) first [number:smallNumber] (tab{s} | page ) [dir=first] [allWindows=false]
+    (select | highlight) first (tab{s} | page) [dir=first] [number=1] [allWindows=false]
+    (select | highlight) last [number:smallNumber] (tab{s} | page ) [dir=last] [allWindows=false]
+    (select | highlight) last (tab{s} | page) [dir=last] [number=1] [allWindows=false]
+"""
+
+[[tabs.selectNumbersTabs.example]]
+phrase = "select first three tabs"
+expectParameters = { dir = "first" }
+
+[[tabs.selectNumbersTabs.example]]
+phrase = "select last two tabs"
+expectParameters = { dir = "last" }
+
+[tabs.closeAll]
+description = "Closes all active or open tabs"
+match = """
+  close (all | every) tab{s} (for me|)
+"""
+
+[[tabs.closeAll.example]]
+phrase = "close all tabs"
+test = true
+
+[[tabs.closeAll.example]]
+phrase = "close every tab"
+test = true
+
+[[tabs.closeAll.example]]
+phrase = "close all tabs for me"
+test = true
+
+[tabs.selectSpecificTabs]
+description = "Select specific tabs after query"
+match = """
+  (select | highlight) (all |) [query] (tab{s} | page{s}) (in | from) all (the|) window{s} [allWindows=true]
+  (select | highlight) (all |) [query] (tab{s} | page{s}) [allWindows=false]
+"""

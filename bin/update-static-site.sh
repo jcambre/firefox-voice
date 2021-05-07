@@ -10,9 +10,30 @@ fi
 
 cd gh-pages && git pull && cd ..
 
-for file in extension/views/lexicon.html extension/views/lexicon.css extension/views/privacy-policy.html ; do
-  cp $file gh-pages/
+for file in extension/views/lexicon.html extension/views/lexicon.css extension/views/privacy-policy.html extension/assets/chime.ogg extension/assets/alarm.mp3 extension/assets ; do
+  cp -r $file gh-pages/
 done
+
+for html in gh-pages/*.html ; do
+  content="$(cat $html)"
+  python -c '
+import sys
+sys.stdout.write(sys.argv[1].replace("../assets/", "assets/").replace("\"/assets/", "\"assets/"))
+' "$content" > $html
+done
+
+(
+  cd homepage
+  if [[ ! -e package.json ]] ; then
+    ln -s package.json.disabled package.json
+  fi
+  npm run maybeinstall
+  npm run build
+)
+
+mkdir -p gh-pages/homepage
+cp -r homepage/build/ gh-pages/homepage/
+
 
 echo "Status of gh-pages/ :"
 cd gh-pages

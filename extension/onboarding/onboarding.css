@@ -1,68 +1,290 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@import url("../assets/css/gui.css");
+@import url("../assets/css/inter.css");
 
-h1 {
-  color: #e31587;
+body {
+  margin: 0;
+  padding: 0;
 }
 
-.highlight {
-  color: #ee7a49;
+#onboarding-wrapper {
+  color: #0f1126;
+  background-image: url("./images/onboarding-background.jpg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  font-family: "Inter" !important;
+  min-height: 100vh;
+  position: relative;
+}
+
+#onboarding-logo {
+  align-self: center;
+}
+
+h1 {
+  font-size: 44px;
+  font-weight: 700;
+  letter-spacing: -1.83px;
 }
 
 a {
-  color: #548adc;
+  font-size: 24px;
+  letter-spacing: -1px;
 }
 
-#welcome-text-content {
-  max-width: 660px;
+p {
+  font-size: 21px;
+  letter-spacing: -0.87px;
+}
+
+.modal-wrapper {
+  display: flex;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.95);
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
+  background: #f9f9fa;
+  border-radius: 2px 2px 14px 14px;
+  box-shadow: 0px 6px 10px 0px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  overflow: scroll;
+  margin: 50px;
+  padding: 50px 100px;
+}
+
+.modal-header,
+.modal-footer {
+  text-align: center;
+}
+
+.modal-footer {
+  display: flex;
+  padding-bottom: 50px;
+  margin: 40px 0;
+}
+
+.success:before {
+  content: "";
+  background-image: url("./images/checkmark.svg");
   background-repeat: no-repeat;
-  background-size: 100% 100%;
+  padding-left: 30px;
 }
 
-@media (max-width: 880px) {
-  #welcome-text-content {
-    max-width: unset;
-    background-size: 120% 100% !important;
-  }
+.warning {
+  background-color: #fcefc3;
+  font-weight: bold;
+  border: 1px solid #f7e4a4;
+  padding: 3px;
 }
 
-@media (min-width: 880px) and (max-width: 1024px) {
-  #wrapper {
-    display: flex;
-  }
-
-  #usage-instructions {
-    margin-left: 5rem;
-  }
-
-  #welcome {
-    font-size: 1.875rem;
-  }
-
-  #privacy-promise {
-    font-size: 1.5rem;
-  }
-
-  .privacy-promise-explanations {
-    font-size: 1.5rem;
-  }
-
-  .learn-more-about-data {
-    font-size: 1rem;
-  }
+#optinWakeword h1:before,
+#optinTechData h1:before,
+#optinVoiceTranscripts h1:before {
+  content: "";
+  background-image: url("./images/icon-optin.svg");
+  background-repeat: no-repeat;
+  background-position-y: 10px;
+  padding-left: 60px;
 }
 
-@media (min-width: 1023px) {
-  #instructions-sub {
-    width: 600px !important;
-  }
+#optinWakeword h1:after,
+#optinTechData h1:after,
+#optinVoiceTranscripts h1:after {
+  display: block;
+  content: "";
+  height: 5px;
+  background-image: linear-gradient(to right, #6173ff, #f10366, #ff9100);
 }
 
-#instructions-sub {
+#optinWakeword .modal a,
+#optinTechData .modal a,
+#optinVoiceTranscripts .modal a {
+  color: #0060df;
+}
+
+#optinWakeword .modal a:hover,
+#optinWakeword .modal a:active,
+#optinTechData .modal a:hover,
+#optinTechData .modal a:active,
+#optinVoiceTranscripts .modal a:hover,
+#optinVoiceTranscripts .modal a:active {
+  color: #003eaa;
+}
+
+.styled-button.cancel-button {
+  color: #0060df;
+  background-color: inherit;
+  /* margin: 15px 0 0 40px; */
+  font-weight: normal;
+  padding: 0 40px;
+}
+
+.styled-button.cancel-button:hover,
+.styled-button.cancel-button:active {
+  color: #003eaa;
+}
+
+.error-modal h1 {
+  color: #d70022;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -1.33px;
+}
+
+.error-modal h1:before {
+  content: "";
+  background-image: url("./images/icon-microphone-red.svg");
+  background-repeat: no-repeat;
+  background-position-y: 10px;
+  padding-left: 30px;
+}
+
+.error-modal .modal-content {
+  text-align: center;
+}
+
+#onboarding-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  padding: 40px 100px;
+  padding-bottom: 15rem;
+}
+
+#toolbar-arrow-wrapper {
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  right: 50px;
+}
+
+#toolbar-arrow {
+  background-image: url("./images/extensions-arrow.svg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 240px;
   width: 400px;
+  float: right;
 }
 
-.instruction-step {
-  color: #20123a;
+.onboarding-section {
+  text-align: center;
+  padding: 50px 0 0 0;
+}
+
+.onboarding-section h1:before {
+  content: "";
+  background-repeat: no-repeat;
+  background-position-y: 5px;
+  padding-left: 40px;
+}
+
+.onboarding-section h1 {
+  display: inline-block;
+}
+
+.onboarding-section h1:after {
+  display: block;
+  content: "";
+  height: 5px;
+  background-image: linear-gradient(to right, #6173ff, #f10366, #ff9100);
+}
+
+.mic-icon h1:before {
+  background-image: url("../popup/images/mic.svg");
+  background-size: 40px auto;
+}
+
+#get-started #keyboard-shortcut {
+  margin-top: 2em;
+}
+
+#get-started #keyboard-shortcut span {
+  background-color: #0f1126;
+  color: white;
+  padding: 0.5em 1em;
+  margin: 0.5em;
+}
+
+.superhero-icon h1:before {
+  background-image: url("./images/icon-superhero.svg");
+}
+
+.try-it p {
+  font-weight: 600;
+}
+
+.try-it ul {
+  font-style: italic;
+  font-weight: 400;
+  font-size: 24px;
+  list-style: none;
+  padding: 0;
+}
+
+.try-it ul li {
+  margin-top: 10px;
+}
+
+#must-allow img.security-button {
+  width: 187px;
+  height: 29px;
+  padding: 0 10px;
+  vertical-align: text-bottom;
+}
+
+#must-allow img.security-panel {
+  width: 410px;
+  height: 225px;
+}
+
+#footer {
+  background: linear-gradient(#25003e, #440071);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  font-size: 14px;
+  font-weight: normal;
+  letter-spacing: -0.58px;
+  padding: 40px 0;
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+}
+
+#footer ul {
+  display: flex;
+  justify-content: center;
+  color: white;
+  list-style: none;
+  padding: 0;
+}
+
+#footer ul li {
+  padding: 0 20px;
+}
+
+#footer a,
+#footer p {
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+}
+
+@media only screen and (max-width: 1240px) {
+  #toolbar-arrow-wrapper {
+    width: 30vw;
+  }
 }

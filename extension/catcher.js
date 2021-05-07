@@ -6,7 +6,18 @@ this.catcher = (function() {
 
   // Note Sentry is usually enabled for live builds and disabled for local development
   // to test Sentry locally use FORCE_SENTRY=1 npm start
-  const activated = (exports.sentryActivated = !!buildSettings.sentryDsn);
+  const activated = (exports.sentryActivated = function() {
+    if (!buildSettings.sentryDsn) {
+      return false;
+    }
+    // This duplicates some logic in settings.js but this isn't a module so it's hard to catch
+    let value = localStorage.getItem("settings");
+    if (!value) {
+      return true;
+    }
+    value = JSON.parse(value);
+    return !value.disableTelemetry;
+  });
 
   function fixUrl(u) {
     return u.replace(hostname, "firefox-voice");
@@ -31,11 +42,20 @@ this.catcher = (function() {
         "No matching message handler",
         // Another common error when something is closed mid-communication:
         "Could not establish connection. Receiving end does not exist.",
-        // This happens when there's a tab is closed in the middle of some action, which is uncommon
-        // but also harmless:
-        /^Invalid Tab ID/,
+        // The speaktome server gives these for any audio without speech:
+        /Failed response from server: 500/,
       ],
       beforeSend(event) {
+        const error = event.exception;
+        if (
+          error &&
+          error.values &&
+          error.values.length &&
+          error.values[0].value.match(/Invalid Tab ID/i)
+        ) {
+          // These exceptions contain the Tab ID, which messes up the fingerprint
+          event.fingerprint = ["Invalid Tab ID"];
+        }
         event.request.url = fixUrl(event.request.url);
         for (const exc of event.exception.values) {
           if (exc.stacktrace && exc.stacktrace.frames) {
@@ -62,7 +82,7 @@ this.catcher = (function() {
   }
 
   exports.capture = function(e) {
-    if (activated) {
+    if (activated()) {
       Sentry.captureException(e);
     }
   };

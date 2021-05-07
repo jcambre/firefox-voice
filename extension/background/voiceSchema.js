@@ -2,8 +2,9 @@
 // This is a copy of:
 // https://github.com/mozilla-services/mozilla-pipeline-schemas/blob/master/schemas/telemetry/voice/voice.4.schema.json
 // When this is updated also please update metrics.md
+// prettier-ignore
 
-this.voiceSchema = {
+export const schema = {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "properties": {
     "application": {
@@ -447,6 +448,10 @@ this.voiceSchema = {
                 "source": {
                   "type": "string"
                 },
+                "ua": {
+                  "description": "derived user agent, see bug 1595063",
+                  "type": "string"
+                },
                 "variation": {
                   "description": "funnel experiment parameters, see bug 1567339",
                   "type": "string"
@@ -719,6 +724,9 @@ this.voiceSchema = {
             },
             "gfx": {
               "properties": {
+                "ContentBackend": {
+                  "type": "string"
+                },
                 "D2DEnabled": {
                   "type": [
                     "boolean",
@@ -1186,7 +1194,7 @@ this.voiceSchema = {
           "type": "boolean"
         },
         "inputLength": {
-          "minumum": 0,
+          "minimum": 0,
           "title": "Number of characters in text/voice input",
           "type": "integer"
         },
@@ -1266,6 +1274,14 @@ this.voiceSchema = {
           "title": "Number of open tabs",
           "type": "integer"
         },
+        "optInAcceptanceTime": {
+          "title": "The timestamp when the user accepted the opt-in",
+          "type": "integer"
+        },
+        "optInAudio": {
+          "title": "Has the user opted in to audio?",
+          "type": "boolean"
+        },
         "serverErrorIntentParser": {
           "description": "Error with the server intent parser",
           "title": "DEPRECATED",
@@ -1332,6 +1348,14 @@ this.voiceSchema = {
           "description": "Typically the slots found in the utterance",
           "title": "Parsed form of the utterance",
           "type": "object"
+        },
+        "wakewordEnabled": {
+          "title": "Has the user enabled the wakeword?",
+          "type": "boolean"
+        },
+        "wakewordUsed": {
+          "title": "Did the user start the intent with a wakeword, and what wakeword?",
+          "type": "string"
         }
       },
       "required": [

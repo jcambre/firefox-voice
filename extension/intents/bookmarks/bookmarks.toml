@@ -1,0 +1,116 @@
+[bookmarks.create]
+description = "Creates a bookmark placing it in the default folder (Other Bookmarks)"
+match = """
+  bookmark (this |) (page | site | tab |) (for me |)
+  (save | add) (this |) (page | site | tab |) (in | to) bookmarks
+"""
+
+[[bookmarks.create.example]]
+phrase = "Bookmark"
+
+[[bookmarks.create.example]]
+phrase = "Bookmark this page"
+test = true
+
+[[bookmarks.create.example]]
+phrase = "Bookmark this"
+test = true
+
+[[bookmarks.create.example]]
+phrase = "Bookmark this site"
+test = true
+
+[[bookmarks.create.example]]
+phrase = "Bookmark page"
+test = true
+
+[[bookmarks.create.example]]
+phrase = "Bookmark tab"
+test = true
+
+[[bookmarks.create.example]]
+phrase = "Bookmark site"
+test = true
+
+[bookmarks.createInFolder]
+description = "Creates a bookmark and puts it in a specific folder"
+match = """
+  (save | add | put | create | ) (this |) bookmark (this |) (page | site | tab |) (in | to) (folder |) [folder]
+  (save | add | put) (this |) (page | site | tab |) (in | to) bookmark{s} folder [folder]
+"""
+
+[[bookmarks.createInFolder.example]]
+phrase = "Bookmark this in a folder"
+expectSlots = {folder = "a folder"}
+
+[bookmarks.open]
+description = "This will search all your bookmarks for the given query, and open what appears to be the best match. Only title and URL are searched"
+match = """
+  open [query] bookmark (for me |) in (this | current |) tab (for me |) [tab=this]
+  open bookmark [query] (for me |) in (this | current |) tab (for me |) [tab=this]
+  open [query] bookmark in new (tab |)
+  open bookmark [query] in new (tab |)
+  open [query] bookmark (for me|)
+  open bookmark [query] (for me|)
+"""
+
+[[bookmarks.open.example]]
+phrase = "Open news bookmark"
+
+[[bookmarks.open.example]]
+phrase = "open query bookmark in this tab"
+test = true
+expectSlots = { query = "query" }
+
+[[bookmarks.open.example]]
+phrase = "open query bookmark for me in this tab"
+test = true
+expectSlots = { query = "query" }
+
+[[bookmarks.open.example]]
+phrase = "open query bookmark in tab for me"
+test = true
+expectSlots = { query = "query" }
+
+[[bookmarks.open.example]]
+phrase = "open bookmark query for me in tab"
+test = true
+expectSlots = { query = "query" }
+
+[bookmarks.remove]
+description = "Remove bookmark from the default folder (Other Bookmarks)"
+match = """
+  (remove | delete) bookmark{s} (from |) (this |) (page | site | tab |) (for me |)
+  (remove | delete) (this |) (page | site | tab |) from bookmark{s}
+"""
+
+[bookmarks.remove.followup]
+description = "Confirm that the user wishes to remove a bookmark"
+match = """
+   yes      [confirmation=true]
+   cancel   [confirmation=false]
+"""
+
+[[bookmarks.remove.example]]
+phrase = "Remove bookmark"
+test = true
+
+[[bookmarks.remove.example]]
+phrase = "Remove bookmark from this page"
+test = true
+
+[[bookmarks.remove.example]]
+phrase = "Delete bookmark"
+test = true
+
+[[bookmarks.remove.example]]
+phrase = "Delete bookmark from this page"
+test = true
+
+[[bookmarks.remove.example]]
+phrase = "Remove bookmarks"
+test = true
+
+[[bookmarks.remove.example]]
+phrase = "Delete bookmarks from this page"
+test = true

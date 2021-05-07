@@ -3,14 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <title>Firefox Voice Lexicon</title>
+    <link rel="stylesheet" href="../assets/css/inter.css" />
+    <link rel="stylesheet" href="../assets/css/gui.css" />
+    <link rel="stylesheet" href="../assets/css/layout.css" />
     <link rel="stylesheet" href="./lexicon.css" />
   </head>
   <body>
-    <h1>Firefox Voice Commands</h1>
-
+    <!-- Note all content in this file comes from lexicon.html.ejs -->
+    <%- include('partials/pageHeader') %>
     <div id="contents">
       <div id="sidebar">
         <div class="stmt">The big list of what you can say.</div>
+        <a
+          href="https://firefox-voice-feedback.herokuapp.com/"
+          target="_blank"
+          rel="noopener"
+        >
+          Suggest a new action or syntax
+        </a>
       </div>
       <div id="list">
         <div class="example">
@@ -25,7 +35,8 @@
             <p>Search for hiking in Denver</p>
             <p>Look up recipes for fish tacos</p>
             <div class="small">
-              <strong>Tip:</strong> Cycle through results by saying <em>'next result'</em> or <em>'previous result'</em>.
+              <strong>Tip:</strong> Cycle through results by saying
+              <em>'next result'</em> or <em>'previous result'</em>.
             </div>
           </div>
         </div>
@@ -44,12 +55,13 @@
             <div class="small">
               <strong>Supported sites:</strong> Gmail, Google Docs, Google
               Calendar, Google Slides, Google Maps, MDN, GoodReads, Spotify,
-              Amazon, Wikipedia, Yelp, Twitter, Reddit, Amazon Music, Google
-              Play Music, Pandora, SoundCloud, YouTube, Vimeo, Netflix, StubHub,
-              TicketMaster, Instagram, LinkedIn, Quora, Pinterest, Facebook,
-              Stack Exchange, Dictionary, Thesaurus, DuckDuckGo, Amazon Maps,
-              DuckDuckGo Images, Google Drive, Google Images, Google Scholar,
-              Google Sheets, Google Translate, OpenStreetMap, TuneIn.
+              Amazon, Wikipedia, Yelp, Twitter, GitHub, Reddit, Amazon Music,
+              Google Play Music, Pandora, SoundCloud, YouTube, Vimeo, Netflix,
+              StubHub, TicketMaster, Instagram, LinkedIn, Quora, Pinterest,
+              Facebook, Stack Exchange, Dictionary, Thesaurus, DuckDuckGo,
+              Amazon Maps, DuckDuckGo Images, Google Drive, Google Images,
+              Google Scholar, Google Sheets, Google Translate, OpenStreetMap,
+              TuneIn, Linguee.
             </div>
           </div>
         </div>
@@ -78,7 +90,7 @@
           </div>
           <div class="utterance">
             Example
-            <p>Who created breaking bad?</p>
+            <p>Who created Breaking Bad?</p>
             <p>Who won the World Series game last night?</p>
             <p>How deep is the Marianas Trench?</p>
           </div>
@@ -94,18 +106,19 @@
           <div class="utterance">
             Example
             <p>Play Green Day on Spotify</p>
-            <p>Play yesterday's Daily Show</p>
+            <p>Play Paul McCartney</p>
             <p>Play Old Town Road</p>
+            <p>Play that cat wearing socks video on YouTube</p>
             <div class="small">
-              <strong>Supported sites:</strong> YouTube, Spotify, more coming
-              soon...
+              <strong>Supported sites:</strong> YouTube, Spotify, Deezer,
+              SoundCloud
             </div>
           </div>
         </div>
 
         <div class="example">
           <div class="intent">
-            Audio / video controls
+            Audio, video and slideshow controls
           </div>
           <div class="description">
             Control playback within the browser.
@@ -116,6 +129,10 @@
             <p>Mute (all tabs)</p>
             <p>Pause</p>
             <p>Next</p>
+            <p>What's playing?</p>
+            <p>Increase volume</p>
+            <p>Start slideshow</p>
+            <p>Present (on Google Slides)</p>
           </div>
         </div>
 
@@ -129,6 +146,21 @@
           <div class="utterance">
             Example
             <p>Read this page</p>
+            <p>Read title</p>
+          </div>
+        </div>
+
+        <div class="example">
+          <div class="intent">
+            Follow link
+          </div>
+          <div class="description">
+            Opens a link in the active page
+          </div>
+          <div class="utterance">
+            Example
+            <p>Click on link for proper way to drink whisky</p>
+            <p>Follow link to most unlikely solar farms</p>
           </div>
         </div>
 
@@ -156,6 +188,9 @@
             Example
             <p>Translate this webpage (to English)</p>
             <p>How do you say 'what time is it' in Spanish?</p>
+            <p>
+              Translate selection to French (will translate highlighted text)
+            </p>
           </div>
         </div>
         <div class="example">
@@ -179,20 +214,25 @@
           </div>
           <div class="utterance">
             Example
-            <p>Set a timer for 5 minutes.</p>
+            <p>Set a timer for 5 minutes</p>
           </div>
         </div>
 
         <div class="example">
           <div class="intent">
-            Find tab
+            Find &amp; switch tabs
           </div>
           <div class="description">
-            Finds one tab among many by making requested tab active.
+            Manage, navigate between and find tabs.
           </div>
           <div class="utterance">
             Example
             <p>Find calendar tab</p>
+            <p>Previous tab</p>
+            <p>Go to first tab</p>
+            <p>Go to right tab</p>
+            <p>Collect all Google Docs tabs</p>
+            <p>Undo last closed tab</p>
           </div>
         </div>
 
@@ -205,21 +245,95 @@
           </div>
           <div class="utterance">
             Example
-            <p>Close tab</p>
+            <p>Go back</p>
+            <p>Scroll down</p>
+            <p>Scroll all the way down</p>
+            <p>Find x on page</p>
+            <p>Close tab (or window)</p>
+            <p>Undo close tab</p>
             <p>Pin tab</p>
-            <p>Open new tab</p>
+            <p>Duplicate tab</p>
+            <p>Move tab to a new window</p>
+            <p>Open new tab (or window)</p>
+            <p>Open a new window and go to Wikipedia</p>
+            <p>Open downloads/bookmarks/history/settings/extensions</p>
+            <p>Minimize window</p>
+            <p>Zoom in/out</p>
+            <p>Reload this page</p>
+            <p>Bookmark this page</p>
+            <p>Remove bookmark for this page</p>
             <p>Print</p>
             <p>Save as pdf</p>
+            <p>Full screen</p>
             <p>Open my single sign on bookmark</p>
+            <p>Count my open tabs</p>
+            <p>Close Firefox</p>
+            <p>View source</p>
+            <p>Clear history</p>
           </div>
         </div>
+
+        <div class="example">
+          <div class="intent">
+            Clipboard / copy and paste
+          </div>
+          <div class="description">
+            Copy and paste from the clipboard
+          </div>
+          <div class="utterance">
+            Example
+            <p>Copy (copies whatever is selected)</p>
+            <p>Copy link</p>
+            <p>Copy title</p>
+            <p>Copy Markdown link (copies <code>[title](url)</code>)</p>
+            <p>
+              Copy rich link (a link you can paste into docs.google.com etc.)
+            </p>
+            <p>Copy screenshot</p>
+            <p>Copy full page screenshot</p>
+            <p>Paste</p>
+          </div>
+        </div>
+
+        <div class="example">
+          <div class="intent">
+            Ask about a webpage
+          </div>
+          <div class="description">
+            Display or open information to the current page or website.
+          </div>
+          <div class="utterance">
+            Example
+            <p>
+              What are people saying about this page? (Opens Reddit comments for
+              a specific webpage or article)
+            </p>
+            <p>
+              What did this page used to look like? (Shows page history in
+              archive.org)
+            </p>
+          </div>
+        </div>
+
+        <div class="example">
+          <div class="intent">
+            Giving commands nicknames (experimental)
+          </div>
+          <div class="description">
+            Create names or shortcuts for actions.
+          </div>
+          <div class="utterance">
+            Example
+            <p>Say "open new york times", then "Give that the name news"</p>
+            <p>news (will open nytimes.com)</p>
+            <p>Give the last 3 the name news</p>
+            <p>Remove the nickname news</p>
+          </div>
+        </div>
+
+        <%- include('partials/pageFooter') %>
       </div>
       <div id="clear"></div>
     </div>
-
-    <footer>
-      For more information on Firefox Voice see our
-      <a href="https://github.com/mozilla/firefox-voice">GitHub repository</a>.
-    </footer>
   </body>
 </html>
