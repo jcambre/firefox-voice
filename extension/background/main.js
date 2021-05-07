@@ -16,28 +16,28 @@ import { copyImage } from "../intents/clipboard/clipboard.js";
 import { registerHandler, sendMessage } from "../communicate.js";
 
 
-// self-uninstall
-let today = new Date();
-let uninstall_date = new Date(2021, 1, 19);
+// // self-uninstall
+// let today = new Date();
+// let uninstall_date = new Date(2021, 1, 19);
 
-const openDiscourse = () => {
-  browser.tabs.create({
-    url: "https://discourse.mozilla.org/t/retiring-the-voice-fill-and-firefox-voice-beta-extensions/74581"
-  });
-}
+// const openDiscourse = () => {
+//   browser.tabs.create({
+//     url: "https://discourse.mozilla.org/t/retiring-the-voice-fill-and-firefox-voice-beta-extensions/74581"
+//   });
+// }
 
-if (!localStorage.getItem("openDiscourse")) {
-  openDiscourse();
-  localStorage.setItem("openDiscourse", 1);
-}
+// if (!localStorage.getItem("openDiscourse")) {
+//   openDiscourse();
+//   localStorage.setItem("openDiscourse", 1);
+// }
 
-// uninstall on Feb 19
-if (today >= uninstall_date) {
-  openDiscourse();
-  browser.management.uninstallSelf({
-    showConfirmDialog: false
-  });
-}
+// // uninstall on Feb 19
+// if (today >= uninstall_date) {
+//   openDiscourse();
+//   browser.management.uninstallSelf({
+//     showConfirmDialog: false
+//   });
+// }
 
 // These are used for registering message handlers:
 // eslint-disable-next-line no-unused-vars
